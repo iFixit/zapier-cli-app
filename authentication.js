@@ -8,6 +8,8 @@
  *    tokens during initial connection and when the 'test' button on the
  *    connection is used... this is just how Zapier does it.
  *
+ * 3) We went with the 'session' model because it has a mechanism for refreshing the token if it becomes invalid.
+ *
  */
 
 /**
@@ -61,7 +63,7 @@ const getAuthKey = (z, bundle) => {
 /**
  * Export the JSON schema for authentication
  *
- * type: 'session' is the type of authentication model we are using
+ * type: 'session' is the type of authentication model we are using.
  * test: 'url' is what we bang to confirm the sessionKey (authToken in dozuki speak) is working.
  * connectionLabel: Is how we get the email address displayed within the connection UI.
  * fields: Describes the controls we use to get the authData.  Site, Email and Password.
