@@ -7,10 +7,8 @@ const newPage          = require('./triggers/newPage');
 const newGuide         = require('./triggers/newGuide');
 const newGuideReleased = require('./triggers/newGuideReleased');
 const newWorkLogEntry  = require('./triggers/newWorkLogEntry');
-
-// TODO: I think these are new... not sure what endpoint to use or what options to provide.
-//const newImage       = require('./triggers/newImage');
-//const newVideo       = require('./triggers/newVideo');
+const newImage         = require('./triggers/newImage');
+//const newVideo         = require('./triggers/newVideo');
 
 /**
  * API_APP_ID is used to identify the app to our API.
@@ -73,6 +71,7 @@ const App = {
       sessionRefreshIf401
    ],
    resources: {
+      // Re-purposing the newTeam.
       team: {
          key: 'team',
          noun: 'team',
@@ -87,22 +86,6 @@ const App = {
             }
          }
       },
-      // TODO: This doesn't work... I think I can remove it.
-      // Re-purposing the newUser.
-      user: {
-         key: 'user',
-         noun: 'user',
-         list: {
-            display: {
-               label: 'List Users',
-               description: 'List users for the user filter drop down.',
-               hidden: true
-            },
-            operation: {
-               perform: newUser.operation.perform
-            }
-         }
-      },
    },
    triggers: {
       [newUser.key]: newUser,
@@ -112,21 +95,20 @@ const App = {
       [newGuide.key]: newGuide,
       [newGuideReleased.key]: newGuideReleased,
       [newWorkLogEntry.key]: newWorkLogEntry,
-// TODO: These are new concepts... TBD.
-//      [newImage.key]: newImage,
+      [newImage.key]: newImage,
 //      [newVideo.key]: newVideo,
    },
    searches: {},
    creates: {
-/*
-   - Add Comment
-   - Create Page
-   - Add Team Member
-   - Finish A Work Log Entry
-   - Start A Work Log Entry
-   - Capture Data In Work Log
-   - Create User
-*/
+      /*
+         - Add Comment
+         - Create Page
+         - Add Team Member
+         - Finish A Work Log Entry
+         - Start A Work Log Entry
+         - Capture Data In Work Log
+         - Create User
+      */
    },
    authentication: authentication
 };
