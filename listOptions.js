@@ -45,7 +45,14 @@ class ListOptions {
                 + response.status + " : " + JSON.stringify(response.json));
             } else {
                // Sometimes we need to tunnel down to get to the data set.
-               let responseToParse = this.getDataOffset(response.json);
+               let responseToParse = null;
+
+               // Kludge for the image stuff... the results come back in a different format than the others.
+               if (response.json[0] && response.json[0].image && this.dataOffset[0] === 'image') {
+                  responseToParse = [this.getDataOffset(response.json[0])];
+               } else {
+                  responseToParse = this.getDataOffset(response.json);
+               }
 
                // We need to add an 'id' field for Zapier.
                // Sometimes we use a concatenation of multiple data points.
