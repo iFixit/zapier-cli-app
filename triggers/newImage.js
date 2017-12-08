@@ -1,42 +1,61 @@
-/* TODO: This and the video trigger are not yet defined... this is just a stub. */
+const ListOptions     = require('../listOptions');
 
 /**
+ * checkForNewImages will pull the image list for the logged in user.
+ *
+ * Note: Is an unique case in that this record already has an 'id' field.  We
+ *  overwrite it with the guid field for Zapier to use.
  *
  * @param z
  * @param bundle
- * @returns {Promise|Promise.<TResult>}
+ * @returns {*}
  */
 const checkForNewImages = (z, bundle) => {
-   const promise = z.request('https://' + bundle.authData.siteName
-    + '.dozuki.com/api/2.0/images', {
-      params: {
-         limit: 200,
-         order: 'DESC'
-      }
-      , timeout: 5000
-   });
+   let listOptions = new ListOptions(bundle.authData.siteName);
 
-   return promise.then((response) => {
-      if (response.status !== httpCodes.success) {
-         throw new Error('Bad login ' + response.message + " : " + response.status + " : " + JSON.stringify(response.json));
-      } else {
-         // Translate 'imageid' into the 'id' for Zapier
-         for (let x in response.json) {
-            response.json[x].id = response.json[x].imageid;
-         }
-         return response.json;
-      }
-   });
+   listOptions.endpoint   = ['user', 'media', 'images'];
+   listOptions.zidFields  = ['guid'];  // Use the guid instead of the id.
+   listOptions.dataOffset = ['image'];
+
+   return listOptions.getListFromEndpoint(z);
 };
 
 module.exports = {
    key: 'newImage',
-   noun: 'New Image',
+   noun: 'new image',
    display: {
       label: 'New Image',
-      description: 'Trigger when a new image is added.'
+      description: 'Triggers when new images are added to the users media manager.'
    },
    operation: {
+      sample: {
+         "id": 12,
+         "teamid": 12,
+         "image": null,
+         "name": "Super Team",
+         "description": "A really super team.",
+         "owner": 123,
+         "location": null,
+         "latitude": null,
+         "longitude": null,
+         "reputation": 1234,
+         "member_count": 5,
+         "new_member_since": 1512423833
+      },
+      outputFields: [
+         {key: 'id', label: 'ID'},
+         {key: 'teamid', label: 'Team ID'},
+         {key: 'image', label: 'Image'},
+         {key: 'name', label: 'Name'},
+         {key: 'description', label: 'Description'},
+         {key: 'owner', label: 'Owner'},
+         {key: 'location', label: 'Location'},
+         {key: 'latitude', label: 'Latitude'},
+         {key: 'longitude', label: 'Longitude'},
+         {key: 'reputation', label: 'Reputation'},
+         {key: 'member_count', label: 'Member Count'},
+         {key: 'new_member_since', label: 'New Member Since'}
+      ],
       perform: checkForNewImages
    }
 };
