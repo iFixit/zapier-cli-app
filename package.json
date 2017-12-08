@@ -1,0 +1,24 @@
+{
+  "name": "dozuki-zapier-app",
+  "version": "1.0.4",
+  "description": "Dozuki app for the Zapier platform.",
+  "repository": "dozuki/dozuki-zapier-app",
+  "homepage": "https://dozuki.com/",
+  "author": "Shaun Harrington <shaun@dozuki.com>",
+  "license": "BSD-3-Clause",
+  "main": "index.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha --recursive"
+  },
+  "engines": {
+    "node": "6.10.2",
+    "npm": ">=3.10.10"
+  },
+  "dependencies": {
+    "zapier-platform-core": "4.1.0"
+  },
+  "devDependencies": {
+    "mocha": "3.2.0",
+    "should": "^13.1.3"
+  }
+}
