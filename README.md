@@ -20,6 +20,8 @@ Unit test code is in `./test`.
 
 # The Code #
 
+GitHub Repository: `https://github.com/iFixit/zapier-cli-app`
+
  - `./index.php` is where the app implementation lives.  Start here.
  - `./authentication.js` wraps up of token retrieval... refreshing is implemented at the app level.
  - `./listOptions.js` wraps up our API for simple data pulls (GET). Check out a trigger to see it how it is used.
