@@ -19,7 +19,8 @@ describe('My App Tests...', () => {
    doNewPageTests(sessionKey);
    doNewWorkLogEntryTests(sessionKey);
    doNewGuideTests(sessionKey);
-   doNewGuideRelease(sessionKey);
+   doNewGuideReleaseTests(sessionKey);
+   doNewImageTests(sessionKey);
 });
 
 function doAuthTests() {
@@ -295,7 +296,7 @@ function doNewGuideTests(sessionKey) {
    });
 }
 
-function doNewGuideRelease(sessionKey) {
+function doNewGuideReleaseTests(sessionKey) {
    let bundle = {
       authData: {
          email: 'shaun@dozuki.com',
@@ -307,6 +308,28 @@ function doNewGuideRelease(sessionKey) {
 
    it('should retrieve released guides', (done) => {
       appTester(App.triggers.newGuideReleased.operation.perform, bundle)
+       .then(results => {
+          //console.log('doNewGuideTestsResults=', results);
+          done();
+       })
+       .catch(err => {
+          done(err);
+       });
+   });
+}
+
+function doNewImageTests(sessionKey) {
+   let bundle = {
+      authData: {
+         email: 'shaun@dozuki.com',
+         password: 'j1mgyWhy',
+         siteName: 'slo',
+         sessionKey: sessionKey
+      }
+   };
+
+   it('should retrieve new images', (done) => {
+      appTester(App.triggers.newImage.operation.perform, bundle)
        .then(results => {
           //console.log('doNewGuideTestsResults=', results);
           done();
