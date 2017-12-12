@@ -1,4 +1,26 @@
-const ListOptions     = require('../listOptions');
+const dozukiAPI     = require('../tools/dozukiAPI');
+
+/**
+ * extractDataFromResponse will pull the work log entry data out of a response.
+ *
+ * An 'id' key/value pair (for Zapier) is added to each result, using the
+ * result's 'entryid'.
+ *
+ * Result data is found in the 'results' node.
+ *
+ * @param response
+ * @returns {JSONReporter|*}
+ */
+const extractDataFromResponse = (response) => {
+   let responseReleases = response.json.results;
+
+   for (let x in responseReleases) {
+      if (responseReleases.hasOwnProperty(x)) {
+         responseReleases[x].id = responseReleases[x].entryid;
+      }
+   }
+   return responseReleases;
+};
 
 /**
  * checkForNewWorkLogEntries
@@ -8,25 +30,24 @@ const ListOptions     = require('../listOptions');
  * @returns {Promise|Promise.<TResult>}
  */
 const checkForNewWorkLogEntries = (z, bundle) => {
-   let listOptions = new ListOptions(bundle.authData.siteName);
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
 
-   listOptions.endpoint   = ['work_log'];
-   listOptions.zidFields  = ['entryid'];
-   listOptions.dataOffset = ['results'];
+   dAPI.endpoint = ['work_log'];
+   dAPI.callback = extractDataFromResponse;
 
    if (bundle.inputData.guideid) {
-      listOptions.getParams.guideid = bundle.inputData.guideid;
+      dAPI.getParams.guideid = bundle.inputData.guideid;
    }
 
    if (bundle.inputData.userid) {
-      listOptions.getParams.userid = bundle.inputData.userid;
+      dAPI.getParams.userid = bundle.inputData.userid;
    }
 
    if (bundle.inputData.workorderid) {
-      listOptions.getParams.workorderid = bundle.inputData.workorderid;
+      dAPI.getParams.workorderid = bundle.inputData.workorderid;
    }
 
-   return listOptions.getListFromEndpoint(z);
+   return dAPI.getListFromEndpoint(z);
 };
 
 module.exports = {

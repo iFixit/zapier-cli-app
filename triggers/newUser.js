@@ -1,4 +1,22 @@
-const ListOptions     = require('../listOptions');
+const dozukiAPI     = require('../tools/dozukiAPI');
+
+/**
+ * extractDataFromResponse will pull the user data out of a response.
+ *
+ * An 'id' key/value pair (for Zapier) is added to each result, using the
+ * result's 'userid'.
+ *
+ * @param response
+ * @returns {JSONReporter|*}
+ */
+const extractDataFromResponse = (response) => {
+   for (let x in response.json) {
+      if (response.json.hasOwnProperty(x)) {
+         response.json[x].id = response.json[x].userid;
+      }
+   }
+   return response.json;
+};
 
 /**
  * checkForNewUsers will pull the user list.
@@ -13,12 +31,12 @@ const ListOptions     = require('../listOptions');
  * @returns {*}
  */
 const checkForNewUsers = (z, bundle) => {
-   let listOptions = new ListOptions(bundle.authData.siteName);
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
 
-   listOptions.endpoint  = ['users'];
-   listOptions.zidFields = ['userid'];
+   dAPI.endpoint = ['users'];
+   dAPI.callback = extractDataFromResponse;
 
-   return listOptions.getListFromEndpoint(z);
+   return dAPI.getListFromEndpoint(z);
 };
 
 module.exports = {
@@ -52,13 +70,9 @@ module.exports = {
          {key: 'id', label: 'ID'},
          {key: 'userid', label: 'User ID'},
          {key: 'unique_username', label: 'Unique Username'},
-         {key: 'username', label: 'Username'},
          {key: 'join_date', label: 'Join Date'},
          {key: 'image', label: 'Image'},
-         {key: 'url', label: 'URL'},
-         {key: 'teams', label: 'Teams'},
-         {key: 'privileges', label: 'Privileges'},
-         {key: 'reputation', label: 'Reputation'}
+         {key: 'url', label: 'URL'}
       ],
       perform: checkForNewUsers
    }

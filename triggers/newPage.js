@@ -1,4 +1,22 @@
-const ListOptions     = require('../listOptions');
+const dozukiAPI     = require('../tools/dozukiAPI');
+
+/**
+ * extractDataFromResponse will pull the page data out of a response.
+ *
+ * An 'id' key/value pair (for Zapier) is added to each result, using the
+ * result's 'wikiid'.
+ *
+ * @param response
+ * @returns {Array}
+ */
+const extractDataFromResponse = (response) => {
+   for (let x in response.json) {
+      if (response.json.hasOwnProperty(x)) {
+         response.json[x].id = response.json[x].wikiid;
+      }
+   }
+   return response.json;
+};
 
 /**
  * checkForNewPages
@@ -8,12 +26,12 @@ const ListOptions     = require('../listOptions');
  * @returns {*}
  */
 const checkForNewPages = (z, bundle) => {
-   let listOptions = new ListOptions(bundle.authData.siteName);
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
 
-   listOptions.endpoint  = ['wikis', bundle.inputData.pageType];
-   listOptions.zidFields = ['wikiid'];
+   dAPI.endpoint = ['wikis', bundle.inputData.pageType];
+   dAPI.callback = extractDataFromResponse;
 
-   return listOptions.getListFromEndpoint(z);
+   return dAPI.getListFromEndpoint(z);
 };
 
 module.exports = {

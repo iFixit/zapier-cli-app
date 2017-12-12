@@ -1,4 +1,26 @@
-const ListOptions     = require('../listOptions');
+const dozukiAPI     = require('../tools/dozukiAPI');
+
+/**
+ * extractDataFromResponse will pull the released guide data out of a response.
+ *
+ * An 'id' key/value pair (for Zapier) added to each result, using a
+ * concatenation of the result's 'releaseid' and 'status' values.
+ *
+ * Result data is found in the 'releases' node.
+ *
+ * @param response
+ * @returns {*}
+ */
+const extractDataFromResponse = (response) => {
+   let responseReleases = response.json.releases;
+
+   for (let x in responseReleases) {
+      if (responseReleases.hasOwnProperty(x)) {
+         responseReleases[x].id = responseReleases[x].releaseid.toString().concat(responseReleases[x].status);
+      }
+   }
+   return responseReleases;
+};
 
 /**
  * checkForNewGuides is technically new guide published.
@@ -8,13 +30,12 @@ const ListOptions     = require('../listOptions');
  * @returns {*}
  */
 const checkForNewReleasedGuides = (z, bundle) => {
-   let listOptions = new ListOptions(bundle.authData.siteName);
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
 
-   listOptions.endpoint   = ['guides', 'releases'];
-   listOptions.zidFields  = ['releaseid', 'status'];
-   listOptions.dataOffset = ['releases'];
+   dAPI.endpoint = ['guides', 'releases'];
+   dAPI.callback = extractDataFromResponse;
 
-   return listOptions.getListFromEndpoint(z);
+   return dAPI.getListFromEndpoint(z);
 };
 
 module.exports = {

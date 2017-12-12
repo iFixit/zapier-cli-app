@@ -1,4 +1,22 @@
-const ListOptions     = require('../listOptions');
+const dozukiAPI     = require('../tools/dozukiAPI');
+
+/**
+ * extractDataFromResponse will pull the team data out of a response.
+ *
+ * An 'id' key/value pair (for Zapier) is added to each result, using the
+ * result's 'teamid'.
+ *
+ * @param response
+ * @returns {JSONReporter|*}
+ */
+const extractDataFromResponse = (response) => {
+   for (let x in response.json) {
+      if (response.json.hasOwnProperty(x)) {
+         response.json[x].id = response.json[x].teamid;
+      }
+   }
+   return response.json;
+};
 
 /**
  * checkForNewTeams will pull the team list.
@@ -13,12 +31,12 @@ const ListOptions     = require('../listOptions');
  * @returns {*}
  */
 const checkForNewTeams = (z, bundle) => {
-   let listOptions = new ListOptions(bundle.authData.siteName);
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
 
-   listOptions.endpoint = ['teams'];
-   listOptions.zidFields  = ['teamid'];
+   dAPI.endpoint = ['teams'];
+   dAPI.callback = extractDataFromResponse;
 
-   return listOptions.getListFromEndpoint(z);
+   return dAPI.getListFromEndpoint(z);
 };
 
 module.exports = {
