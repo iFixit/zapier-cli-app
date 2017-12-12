@@ -2,7 +2,7 @@ const should = require('should');
 const zapier = require('zapier-platform-core');
 const App    = require('../index.js');
 
-const authentication = require('../authentication');
+const authentication = require('../tools/authentication');
 
 const appTester = zapier.createAppTester(App);
 
@@ -12,15 +12,17 @@ describe('My App Tests...', () => {
    // doNewTeamTests can potentially change the token out from under a live zap if it is pointing at the same site and using the same user login.
    //doGetAuthKeyAndNewTeamTests();
 
-   let sessionKey = '2782178abcbc5d7944f1cefcadf67019';
+   let sessionKey = '69843dc989fe2450ae3bd7d1caf5cf11';
    doNewTeamTests(sessionKey);
    doNewTeamMemberTests(sessionKey, 35, 55);
    doNewUserTests(sessionKey);
-   doNewPageTests(sessionKey);
    doNewWorkLogEntryTests(sessionKey);
+   doNewPageTests(sessionKey);
    doNewGuideTests(sessionKey);
    doNewGuideReleaseTests(sessionKey);
    doNewImageTests(sessionKey);
+   //doNewVideoTests(sessionKey);
+   doCreateCommentTests(sessionKey);
 });
 
 function doAuthTests() {
@@ -215,7 +217,7 @@ function doNewUserTests(sessionKey) {
    it('should retrieve users', (done) => {
       appTester(App.triggers.newUser.operation.perform, bundle)
        .then(results => {
-//          console.log('doNewUserTests', results);
+          // console.log('doNewUserTests', results);
           done();
        })
        .catch(err => {
@@ -264,7 +266,7 @@ function doNewWorkLogEntryTests(sessionKey) {
    it('should retrieve new work logs', (done) => {
       appTester(App.triggers.newWorkLogEntry.operation.perform, bundle)
        .then(results => {
-          //console.log('doNewPageTests', results);
+          // console.log('doNewWorkLogEntryTests', results);
           done();
        })
        .catch(err => {
@@ -328,10 +330,60 @@ function doNewImageTests(sessionKey) {
       }
    };
 
-   it('should retrieve new images', (done) => {
+   it('should retrieve images', (done) => {
       appTester(App.triggers.newImage.operation.perform, bundle)
        .then(results => {
-          //console.log('doNewGuideTestsResults=', results);
+          // Visual check of final bloats output...
+          //console.log('doNewImageTests=', results);
+          done();
+       })
+       .catch(err => {
+          done(err);
+       });
+   });
+}
+
+function doNewVideoTests(sessionKey) {
+   let bundle = {
+      authData: {
+         email: 'shaun@dozuki.com',
+         password: 'j1mgyWhy',
+         siteName: 'slo',
+         sessionKey: sessionKey
+      }
+   };
+
+   it('should retrieve videos', (done) => {
+      appTester(App.triggers.newVideo.operation.perform, bundle)
+       .then(results => {
+          // console.log('doNewVideoTests=', results);
+          done();
+       })
+       .catch(err => {
+          done(err);
+       });
+   });
+}
+
+function doCreateCommentTests(sessionKey) {
+   let randomData = Math.random().toString(36).substring(7);
+   let bundle = {
+      authData: {
+         email: 'shaun@dozuki.com',
+         password: 'j1mgyWhy',
+         siteName: 'slo',
+         sessionKey: sessionKey
+      },
+      inputData: {
+         parentId: 85,
+         commentText: "This is a comment" + randomData
+      }
+   };
+
+   it('should retrieve videos', (done) => {
+      appTester(App.creates.createComment.operation.perform, bundle)
+       .then(results => {
+          // console.log('doCreateCommentTests=', results);
           done();
        })
        .catch(err => {
