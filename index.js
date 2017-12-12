@@ -1,5 +1,5 @@
-const httpCodes        = require('./httpCodes');
-const authentication   = require('./authentication');
+const httpCodes        = require('./tools/httpCodes');
+const authentication   = require('./tools/authentication');
 const newTeam          = require('./triggers/newTeam');
 const newTeamMember    = require('./triggers/newTeamMember');
 const newUser          = require('./triggers/newUser');
@@ -8,7 +8,10 @@ const newGuide         = require('./triggers/newGuide');
 const newGuideReleased = require('./triggers/newGuideReleased');
 const newWorkLogEntry  = require('./triggers/newWorkLogEntry');
 const newImage         = require('./triggers/newImage');
-//const newVideo         = require('./triggers/newVideo');
+const newVideo         = require('./triggers/newVideo');
+const createComment    = require('./creates/createComment');
+const createStartedWorkLogEntry = require('./creates/createStartedWorkLogEntry');
+const createFinishedWorkLogEntry = require('./creates/createFinishedWorkLogEntry');
 
 /**
  * API_APP_ID is used to identify the app to our API.
@@ -96,18 +99,21 @@ const App = {
       [newGuideReleased.key]: newGuideReleased,
       [newWorkLogEntry.key]: newWorkLogEntry,
       [newImage.key]: newImage,
-//      [newVideo.key]: newVideo,
+      [newVideo.key]: newVideo
    },
    searches: {},
    creates: {
+      [createComment.key]: createComment,
+      [createStartedWorkLogEntry.key]: createStartedWorkLogEntry,
+      [createFinishedWorkLogEntry.key]: createFinishedWorkLogEntry
       /*
-         - Add Comment
          - Create Page
-         - Add Team Member
          - Finish A Work Log Entry
-         - Start A Work Log Entry
          - Capture Data In Work Log
          - Create User
+         - Add Team Member
+
+         - Add Image (removed?)
       */
    },
    authentication: authentication
