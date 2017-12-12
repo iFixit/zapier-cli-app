@@ -19,7 +19,6 @@ module.exports = {
          };
 
          const promise = z.request({
-            // guide, step, wiki, info or post
             url: 'https://' + bundle.authData.siteName + '.dozuki.com/api/2.0/work_log',
             method: 'POST',
             body: JSON.stringify(myBody),
