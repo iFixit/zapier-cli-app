@@ -1,0 +1,9 @@
+module.exports.newTeam          = require('./newTeam');
+module.exports.newTeamMember    = require('./newTeamMember');
+module.exports.newUser          = require('./newUser');
+module.exports.newPage          = require('./newPage');
+module.exports.newGuide         = require('./newGuide');
+module.exports.newGuideReleased = require('./newGuideReleased');
+module.exports.newWorkLogEntry  = require('./newWorkLogEntry');
+module.exports.newImage         = require('./newImage');
+module.exports.newVideo         = require('./newVideo');
