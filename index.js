@@ -1,17 +1,7 @@
 const httpCodes        = require('./tools/httpCodes');
 const authentication   = require('./tools/authentication');
-const newTeam          = require('./triggers/newTeam');
-const newTeamMember    = require('./triggers/newTeamMember');
-const newUser          = require('./triggers/newUser');
-const newPage          = require('./triggers/newPage');
-const newGuide         = require('./triggers/newGuide');
-const newGuideReleased = require('./triggers/newGuideReleased');
-const newWorkLogEntry  = require('./triggers/newWorkLogEntry');
-const newImage         = require('./triggers/newImage');
-const newVideo         = require('./triggers/newVideo');
-const createComment    = require('./creates/createComment');
-const createStartedWorkLogEntry = require('./creates/createStartedWorkLogEntry');
-const createFinishedWorkLogEntry = require('./creates/createFinishedWorkLogEntry');
+const triggers         = require('./triggers/includeTriggers');
+const creates          = require('./creates/includeCreates');
 
 /**
  * API_APP_ID is used to identify the app to our API.
@@ -62,7 +52,7 @@ const sessionRefreshIf401 = (response, z, bundle) => {
 
 /**
  *
- * @type {{version, platformVersion: *, beforeRequest: [null], afterResponse: [null], resources: {team: {key: string, noun: string, list: {display: {label: string, description: string, hidden: boolean}, operation: {perform: checkForNewTeams}}}}, triggers: {}, searches: {}, creates: {}, authentication: *}}
+ * @type {{version, platformVersion: *, beforeRequest: [null], afterResponse: [null], resources: {team: {key: string, noun: string, list: {display: {label: string, description: string, hidden: boolean}, operation: {perform: checkForNewTeams}}}}, triggers: {}, searches: {}, creates: {}, authentication: {type: string, test: {url: string}, connectionLabel: string, fields: (null|null|null)[], sessionConfig: {perform: (function(*, *))}}}}
  */
 const App = {
    version: require('./package.json').version,
@@ -85,36 +75,32 @@ const App = {
                hidden: true
             },
             operation: {
-               perform: newTeam.operation.perform
+               perform: triggers.newTeam.operation.perform
             }
          }
       },
    },
    triggers: {
-      [newUser.key]: newUser,
-      [newTeam.key]: newTeam,
-      [newTeamMember.key]: newTeamMember,
-      [newPage.key]: newPage,
-      [newGuide.key]: newGuide,
-      [newGuideReleased.key]: newGuideReleased,
-      [newWorkLogEntry.key]: newWorkLogEntry,
-      [newImage.key]: newImage,
-      [newVideo.key]: newVideo
+      [triggers.newUser.key]: triggers.newUser,
+      [triggers.newTeam.key]: triggers.newTeam,
+      [triggers.newTeamMember.key]: triggers.newTeamMember,
+      [triggers.newPage.key]: triggers.newPage,
+      [triggers.newGuide.key]: triggers.newGuide,
+      [triggers.newGuideReleased.key]: triggers.newGuideReleased,
+      [triggers.newWorkLogEntry.key]: triggers.newWorkLogEntry,
+      [triggers.newImage.key]: triggers.newImage,
+      [triggers.newVideo.key]: triggers.newVideo
    },
    searches: {},
    creates: {
-      [createComment.key]: createComment,
-      [createStartedWorkLogEntry.key]: createStartedWorkLogEntry,
-      [createFinishedWorkLogEntry.key]: createFinishedWorkLogEntry
-      /*
-         - Create Page
-         - Finish A Work Log Entry
-         - Capture Data In Work Log
-         - Create User
-         - Add Team Member
-
-         - Add Image (removed?)
-      */
+      [creates.createComment.key]: creates.createComment,
+      [creates.createStartedWorkLogEntry.key]: creates.createStartedWorkLogEntry,
+      [creates.createFinishedWorkLogEntry.key]: creates.createFinishedWorkLogEntry,
+      [creates.createDataCaptureInWorkLogEntry.key]: creates.createDataCaptureInWorkLogEntry,
+      [creates.createUser.key]: creates.createUser,
+      [creates.createTeamMember.key]: creates.createTeamMember,
+      [creates.createPage.key]: creates.createPage,
+//      [creates.createImage.key]: creates.createImage
    },
    authentication: authentication
 };
