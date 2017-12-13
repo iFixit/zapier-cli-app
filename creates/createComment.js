@@ -1,3 +1,24 @@
+const dozukiAPI = require('../tools/dozukiAPI');
+
+const createComment = (z, bundle) => {
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
+
+   dAPI.timeout  = 3000; // Creates seem to take a little longer?
+   dAPI.endpoint = ['comments', bundle.inputData.context, bundle.inputData.contextId];
+
+   dAPI.body.text = bundle.inputData.commentText;
+
+   if (bundle.inputData.parentId) {
+      dAPI.body.parentid = bundle.inputData.parentId;
+   }
+
+   if (bundle.inputData.langId) {
+      dAPI.body.langId = bundle.inputData.langId;
+   }
+
+   return dAPI.postDataOnEndpoint(z, bundle);
+};
+
 module.exports = {
    key: 'createComment',
    noun: 'comment',
@@ -20,31 +41,7 @@ module.exports = {
             , helpText: 'Body of the comment. For sites with public registration, the text length must be at least 12 characters and no more than 1024 characters.'},
          {key: 'parentId', required: false, type: 'string', helpText: 'If the comment is a reply, this is the commentid of the parent comment.'}
       ],
-      perform: (z, bundle) => {
-         let myBody = {
-            text: bundle.inputData.commentText,
-         };
-
-         if (bundle.inputData.parentId) {
-            myBody.parentid = bundle.inputData.parentId;
-         }
-
-         if (bundle.inputData.langId) {
-            myBody.langid = bundle.inputData.langId;
-         }
-
-         const promise = z.request({
-            // guide, step, wiki, info or post
-            url: 'https://' + bundle.authData.siteName + '.dozuki.com/api/2.0/comments/' + bundle.inputData.context + '/' + bundle.inputData.contextId,
-            method: 'POST',
-            body: JSON.stringify(myBody),
-            headers: {
-               'content-type': 'application/json'
-            }
-         });
-
-         return promise.then((response) => JSON.parse(response.content));
-      },
+      perform: createComment,
       sample: {
          "commentid":87,
          "locale":null,
