@@ -18,6 +18,7 @@ Unit test code is in `./test`.
  - `$ zapier link` to link the remote code base to an Zapier App ID.
  - `$ zapier logs` to view the error logs.
  - `$ zapier logs --type=http --detailed --limit=1` to view the http logs.
+ - `zapier logs --type=console` to view the 'z.console.log()' entries.
 
 A list of all commands: https://zapier.github.io/zapier-platform-cli/cli.html?utm_source=zapier.com&utm_medium=referral&utm_campaign=zapier#commands
 
