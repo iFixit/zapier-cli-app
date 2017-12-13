@@ -1,3 +1,14 @@
+const dozukiAPI = require('../tools/dozukiAPI');
+
+const createFinishedWorkLogEntry = (z, bundle) => {
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
+
+   dAPI.timeout  = 3000; // Creates seem to take a little longer?
+   dAPI.endpoint = ['work_log', bundle.inputData.entryId, 'finish'];
+
+   return dAPI.postDataOnEndpoint(z, bundle);
+};
+
 module.exports = {
    key: 'createFinishedWorkLogEntry',
    noun: 'comment',
@@ -10,32 +21,16 @@ module.exports = {
          {key: 'entryId', required: true, type: 'string',
             helpText: 'Set the end time of an entry to the current time, marking the entry as complete.'}
       ],
-      perform: (z, bundle) => {
-         const promise = z.request({
-            // guide, step, wiki, info or post
-            url: 'https://' + bundle.authData.siteName + '.dozuki.com/api/2.0/work_log/' + bundle.inputData.entryId + '/finish',
-            method: 'POST',
-            headers: {
-               'content-type': 'application/json'
-            }
-         });
-
-         return promise.then((response) => JSON.parse(response.content));
-      },
+      perform: createFinishedWorkLogEntry,
       sample: {
          endtime: 1513094744,
          max_form_revisionid: 128,
          guide_revisionid: 6040
       },
       outputFields: [
-         {key: 'guideid', label: 'Guide ID'},
-         {key: 'userid', label: 'User ID'},
-         {key: 'workorderid', label: 'Work Order ID'},
-         {key: 'starttime', label: 'Start Time'},
          {key: 'endtime', label: 'End Time'},
          {key: 'max_form_revisionid', label: 'Max Form Revision ID'},
-         {key: 'work_data', label: 'Work Data'},
-         {key: 'timingid', label: 'Timing ID'},
+         {key: 'guide_revisionid', label: 'Guide Revision ID'}
       ]
    }
 };
