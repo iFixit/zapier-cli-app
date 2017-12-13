@@ -44,7 +44,10 @@ const addApiKeyToHeader = (request, z, bundle) => {
 const sessionRefreshIf401 = (response, z, bundle) => {
    if (bundle.authData.sessionKey) {
       if (response.status === httpCodes.unauthorized) {
-         throw new z.errors.RefreshAuthError('Session key needs refreshing.');
+         // TODO: Debug kludge for not grabbing failed 'createUser' runs.
+         if (!bundle.inputData.uniqueUsername) {
+            throw new z.errors.RefreshAuthError('Session key needs refreshing.');
+         }
       }
    }
    return response;
@@ -100,7 +103,7 @@ const App = {
       [creates.createUser.key]: creates.createUser,
       [creates.createTeamMember.key]: creates.createTeamMember,
       [creates.createPage.key]: creates.createPage,
-//      [creates.createImage.key]: creates.createImage
+      [creates.createImage.key]: creates.createImage
    },
    authentication: authentication
 };
