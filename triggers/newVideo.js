@@ -4,83 +4,20 @@ const extractDataFromResponse = (response) => {
 
    for (let x in response.json) {
       if (response.json.hasOwnProperty(x)) {
-//         console.log(response.json[x]);
 
          // Add 'id' to each result.
          response.json[x].id = response.json[x].videoid;
 
-         // Lift the image id up a level to make it more accessible to the end user.
+         // Lift the image id up a level.
          response.json[x].image.id = response.json[x].image.image.id;
 
+         // lift the encodings up and use their column name as the key.
          for (let y in response.json[x].encodings) {
-
-
-            console.log(response.json[x].encodings[y]);
-
-            response.json[x].encodings[y] = {
-               encoding: response.json[x].encodings[y].column,
-               data: response.json[x].encodings[y]
-            }
-
+            response.json[x][response.json[x].encodings[y].column]
+             = response.json[x].encodings[y];
          }
-
-//         response.json[x].encodings.forEach(encodingData => {
-
-//            console.log("encodingData", encodingData);
-//            Object.keys(encodingData).forEach((key, nDex) => {
-
-//         console.log(key, nDex);
-//         objectEncodings[encodingData.column] = {};
-//         objectEncodings[encodingData.column][key] = {};
-//         objectEncodings.columns = 'hello';
-  //          });
-
-            //    console.log(encodingData);
-            //    response.json[0].encodedURLs[encodingData.column] = encodingData.url;
-//         });
-
-//         response.json[x].encodings[''] = { junk1: {
-  //          something: 'more'
-    //     }};
       }
    }
-   return response.json;
-
-
-//   console.log(response);
-//   dozukiAPI.zidFields  = ['videoid'];  // Use the guid instead of the id.
-//   dozukiAPI.dataOffset = ['image'];
-//   dozukiAPI.idOffset = ['image'];
-
-console.log(response.json);
-   // Use the video is as the Zapier id.
-   response.json[0].id = response.json[0].videoid;
-   response.json[0].mp4_url = response.json[0].encodings[0].url;
-
-
-   let objectEncodings = {
-      test: 'one'
-   };
-
-   // Extract these URLs to make the easier for the to use. (objects?)
-//   response.json[0].encodedURLs = {};
-   response.json[0].encodings.forEach(encodingData => {
-      console.log("encodingData", encodingData);
-      objectEncodings.dump = encodingData;
-       Object.keys(encodingData).forEach((key, nDex) => {
-
-//         console.log(key, nDex);
-//         objectEncodings[encodingData.column] = {};
-//         objectEncodings[encodingData.column][key] = {};
-//         objectEncodings.columns = 'hello';
-      });
-
-  //    console.log(encodingData);
-  //    response.json[0].encodedURLs[encodingData.column] = encodingData.url;
-   });
-   response.json[0].encodings = objectEncodings;
-//   delete response.json[0].encodings; // Hide from user... is worthless.
-
    return response.json;
 };
 
