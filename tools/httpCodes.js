@@ -5,6 +5,7 @@
  */
 const httpCodes = {
    success: 200,
+   created: 201,
    unauthorized: 401,
    internalError: 500
 };
