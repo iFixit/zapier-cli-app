@@ -1,3 +1,20 @@
+const dozukiAPI = require('../tools/dozukiAPI');
+
+const createUser = (z, bundle) => {
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
+
+   dAPI.timeout  = 3000;
+   dAPI.endpoint = ['users'];
+   dAPI.body     = {
+      email: bundle.inputData.email,
+      username: bundle.inputData.username,
+      password: bundle.inputData.password,
+      unique_username: bundle.inputData.uniqueUsername
+   };
+
+   return dAPI.postDataOnEndpoint(z, bundle);
+};
+
 module.exports = {
    key: 'createUser',
    noun: 'create user',
@@ -16,25 +33,7 @@ module.exports = {
          {key: 'uniqueUsername', required: true, type: 'string', label: 'Unique Username',
             helpText: 'A unique username name for this user.'},
       ],
-      perform: (z, bundle) => {
-         let myBody = {
-            email: bundle.inputData.email,
-            username: bundle.inputData.username,
-            password: bundle.inputData.password,
-            unique_username: bundle.inputData.uniqueUsername
-         };
-
-         const promise = z.request({
-            url: 'https://' + bundle.authData.siteName + '.dozuki.com/api/2.0/users',
-            method: 'POST',
-            body: JSON.stringify(myBody),
-            headers: {
-               'content-type': 'application/json'
-            }
-         });
-
-         return promise.then((response) => JSON.parse(response.content));
-      },
+      perform: createUser,
       sample: { userid: 232,
          username: 'newusername',
          unique_username: 'newuniqueusername',
