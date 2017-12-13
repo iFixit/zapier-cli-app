@@ -1,4 +1,4 @@
-const dozukiAPI     = require('../tools/dozukiAPI');
+const dozukiAPI = require('../tools/dozukiAPI');
 
 /**
  * extractDataFromResponse will pull the work log entry data out of a response.

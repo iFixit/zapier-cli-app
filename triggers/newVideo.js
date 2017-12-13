@@ -1,14 +1,20 @@
-const dozukiAPI    = require('../tools/dozukiAPI');
+const dozukiAPI = require('../tools/dozukiAPI');
 
 const extractDataFromResponse = (response) => {
 
    for (let x in response.json) {
       if (response.json.hasOwnProperty(x)) {
 //         console.log(response.json[x]);
+
+         // Add 'id' to each result.
          response.json[x].id = response.json[x].videoid;
+
+         // Lift the image id up a level to make it more accessible to the end user.
          response.json[x].image.id = response.json[x].image.image.id;
 
          for (let y in response.json[x].encodings) {
+
+
             console.log(response.json[x].encodings[y]);
 
             response.json[x].encodings[y] = {
@@ -89,11 +95,11 @@ console.log(response.json);
  * @returns {*}
  */
 const checkForNewVideos = (z, bundle) => {
-   let dozukiAPI      = new dozukiAPI(bundle.authData.siteName);
-   dozukiAPI.endpoint = ['user', 'media', 'videos'];
-   dozukiAPI.callback = extractDataFromResponse;
+   let dAPI      = new dozukiAPI(bundle.authData.siteName);
+   dAPI.endpoint = ['user', 'media', 'videos'];
+   dAPI.callback = extractDataFromResponse;
 
-   return dozukiAPI.getListFromEndpoint(z);
+   return dAPI.getListFromEndpoint(z);
 };
 
 module.exports = {
