@@ -1,3 +1,5 @@
+const httpCodes        = require('./httpCodes');
+
 /**
  * Notes:
  *
@@ -36,8 +38,8 @@ const getAuthKey = (z, bundle) => {
       const promise = z.request('https://'+ bundle.authData.siteName
        +'.dozuki.com/api/2.0/user/token', options);
       return promise.then((response) => {
-         if (response.status !== 201) {
-            if (response.status === 401) {
+         if (response.status !== httpCodes.created) {
+            if (response.status === httpCodes.unauthorized) {
                throw new Error('Invalid username and password combination.');
             } else {
                // include the message, status and json for additional details.
