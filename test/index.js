@@ -1,16 +1,14 @@
-const should = require('should');
-const zapier = require('zapier-platform-core');
-const App    = require('../index.js');
+const should         = require('should');
+const zapier         = require('zapier-platform-core');
+const App            = require('../index.js');
 const authentication = require('../tools/authentication');
 
 function makeid(idLength) {
    let text = "";
    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
    for (let i = 0; i < idLength; i++) {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
    }
-
    return text;
 }
 
@@ -26,33 +24,8 @@ describe('My App Tests...', () => {
       // Use a dedicated testing user if possible.
       doAuthTests(process.env.USER_EMAIL, process.env.USER_PASSWORD);
 
-      // TODO: These are failing so I commented them out of the test suite below!
-      // TODO: Is something wrong with these endpoints?
-
-      //doCreateUserTests();
-      //doCreateImageTests();
-
-      /*
-         CURL examples also fail...
-
-         This does not work:
-         curl -X POST -k -v -d '{"email":"IgaFSplfiQ@dozuki.com","username":"IgaFSplfiQ","password":"thepassword","unique_username":"IgaFSplfiQ"}' -H "X-App-Id: 9c9e0e7ae61d3a70bfe4debb87ad145a" -H "Content-Type: application/json" -H "Authorization: api 74e5d21b1d096c416d83bdc2586d56f5" https://slo.dozuki.com/api/2.0/users
-         {"message":"Please choose a valid unique username."}
-
-         curl -X POST -k -v -d '{"email":"IgaFSplfiQ@dozuki.com","username":"IgaFSplfiQ","password":"thepassword","unique_username":"IgaFSplfiQ"}' -H "X-App-Id: 9c9e0e7ae61d3a70bfe4debb87ad145a" -H "Content-Type: application/json" -H "Authorization: api 74e5d21b1d096c416d83bdc2586d56f5" https://slo.sharrington.cominor.com/api/2.0/users
-
-         Cominor: (also does not work)
-         curl -X POST -k -v -d '{"email":"IgaFSplfiQ@dozuki.com","username":"IgaFSplfiQ","password":"thepassword","unique_username":"IgaFSplfiQ"}' -H "X-App-Id: 9c9e0e7ae61d3a70bfe4debb87ad145a" -H "Content-Type: application/json" -H "Authorization: api 74e5d21b1d096c416d83bdc2586d56f5"  https://slo.sharrington.cominor.com/api/2.0/users
-
-         This works:
-         curl -X POST -k -v -d '{"text":"Say something smart again.","parentid":"85"}' -H "X-App-Id: 9c9e0e7ae61d3a70bfe4debb87ad145a" -H "Content-Type: application/json" -H "Authorization: api 74e5d21b1d096c416d83bdc2586d56f5" https://slo.dozuki.com/api/2.0/comments/guide/429
-
-         curl -X POST -k -v -d '{"file":"https://wallpaperbrowse.com/media/images/colors_explosion_wallpaper_abstract_3d_45.jpg","cropToRatio":"VARIABLE"}' -H "X-App-Id: 9c9e0e7ae61d3a70bfe4debb87ad145a" -H "Content-Type: application/json" -H "Authorization: api 74e5d21b1d096c416d83bdc2586d56f5" https://slo.dozuki.com/api/2.0/user/media/images
-         curl -X POST -k -v -d '{}' -H "X-App-Id: 9c9e0e7ae61d3a70bfe4debb87ad145a" -H "Content-Type: application/json" -H "Authorization: api 74e5d21b1d096c416d83bdc2586d56f5" https://slo.dozuki.com/api/2.0/user/media/images
-      */
-
       doNewTeamTests();
-      doNewTeamMemberTests(35, 55);
+      doNewTeamMemberTests(35, 55); // TODO: turn these a magic numbers into process.env variables?
       doNewUserTests();
       doNewWorkLogEntryTests();
       doNewPageTests();
@@ -64,9 +37,12 @@ describe('My App Tests...', () => {
       doCreateStartedWorkLogEntryTests();
       doCreateDataCaptureInWorkLogEntryTests();
       doCreateFinishedWorkLogEntryTests();
-      //doCreateUserTests();
       doCreateTeamMemberTests();
       doCreatePageTests();
+// TODO: The commented out test are failing!
+// TODO: Is something wrong with these endpoints?
+// TODO: Issues have been opened. (#1 and #2)
+      //doCreateUserTests();
       //doCreateImageTests();
    }
 });
@@ -383,31 +359,6 @@ function doCreateDataCaptureInWorkLogEntryTests() {
    });
 }
 
-function doCreateUserTests() {
-   it('should create a user', (done) => {
-      let randomData = makeid(10);
-
-      let bundle = {
-         authData: getAuthData(),
-         inputData: {
-            email: randomData + '@dozuki.com',
-            username: randomData,
-            password: 'thepassword',
-            uniqueUsername: randomData
-         }
-      };
-
-      appTester(App.creates.createUser.operation.perform, bundle)
-       .then(results => {
-          // console.log('doCreateUserTests=', results);
-          done();
-       })
-       .catch(err => {
-          done(err);
-       });
-   });
-}
-
 function doCreateTeamMemberTests() {
    it('should create a new team member', (done) => {
       let bundle = {
@@ -451,6 +402,31 @@ function doCreatePageTests() {
       appTester(App.creates.createPage.operation.perform, bundle)
        .then(results => {
           // console.log('doCreatePageTests=', results);
+          done();
+       })
+       .catch(err => {
+          done(err);
+       });
+   });
+}
+
+function doCreateUserTests() {
+   it('should create a user', (done) => {
+      let randomData = makeid(10);
+
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            email: randomData + '@dozuki.com',
+            username: randomData,
+            password: 'thepassword',
+            uniqueUsername: randomData
+         }
+      };
+
+      appTester(App.creates.createUser.operation.perform, bundle)
+       .then(results => {
+          // console.log('doCreateUserTests=', results);
           done();
        })
        .catch(err => {
