@@ -3,14 +3,17 @@ const dozukiAPI = require('../tools/dozukiAPI');
 const extractDataFromResponse = (response, bundle) => {
    let data = JSON.parse(response.content);
 
-   // the thing returns the entire list of members instead of just the one that was added.
-   // find that one and return it.
+   // Special Case:
+   // The Api returns the entire list of members instead of just the one that
+   // we added.  We have to find that one in the list and return it.
    for (let x in data) {
-      if (data[x].userid === bundle.inputData.userId) {
+      if (data.hasOwnProperty(x)
+       && (data[x].userid === bundle.inputData.userId)) {
          return data[x];
       }
    }
-   // TODO: This is an error condition that should never be reached?
+
+   // Note: We should only get here if the API returned success without adding.
    return {};
 };
 
