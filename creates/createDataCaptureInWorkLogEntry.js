@@ -1,6 +1,7 @@
 const dozukiAPI = require('../tools/dozukiAPI');
 
 const extractDataFromResponse = (response, bundle) => {
+   // Special case:
    // The API does not return a response... not sure if this is a bug.
    // TODO: Find out if this is a bug!
    return {};
@@ -38,8 +39,8 @@ module.exports = {
          {key: 'lastTimingId', required: false, type: 'string', helpText: "The most recent timingid from a previous request. This prevents multiple sessions from getting out of sync."},
       ],
       perform: createDataCaptureInWorkLogEntry,
-// The API does not return a response... not sure if this is a bug.
-// TODO: Find out if this is a bug!
+// The API does not return a response so there is no sample or outputFields.
+// We may need to revisit this if it turns out to be a bug and it gets fixed.
 //      sample: {},
 //      outputFields: []
    }
