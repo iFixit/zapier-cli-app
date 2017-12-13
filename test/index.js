@@ -476,5 +476,6 @@ function doCreateImageTests() {
        .catch(err => {
           done(err);
        });
-   }).timeout(5000);
+   }).timeout(5000); // Not sure if this is needed or not but this extends the
+                     // time before the test framework aborts.
 }
