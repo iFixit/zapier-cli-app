@@ -5,4 +5,4 @@ module.exports.createDataCaptureInWorkLogEntry = require('./createDataCaptureInW
 module.exports.createUser                      = require('./createUser');
 module.exports.createTeamMember                = require('./createTeamMember');
 module.exports.createPage                      = require('./createPage');
-//module.exports.createImage                      = require('./createImage');
+module.exports.createImage                     = require('./createImage');
