@@ -11,15 +11,41 @@ const DEFAULT_ENDPOINT      = 'guides';
 const DEFAULT_ORDER         = 'DESC';
 
 /**
+ * TESTING ISSUES:
+ *
+ * I can't hit the cominor sites. (ex: slo.sharrington.cominor.com)
+ * I get CERT errors. (ex. 'reason: unable to verify the first certificate')
+ *
+ * I tried...
+ *    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+ *
+ * and I also tried adding these options on the 'request'...
+ *    rejectUnauthorized: false,
+ *    insecure: true,
+ *
+ * to no avail.
+ *
+ * If someone has some insight here I would greatly appreciate it.
+ */
+
+/**
  * dozukiAPI wraps some API endpoint GET calls with common options.
  *
  * Defaults to the '/guides' endpoint so it will work out of the box.
  */
 class dozukiAPI {
 
+   /**
+    * putDataOnEndpoint
+    *
+    * @param z
+    * @param bundle
+    * @returns {Promise|Promise.<TResult>}
+    */
    putDataOnEndpoint(z, bundle) {
 //    if (this.validPutOptions()) {
-         const promise = z.request(this.getEndPoint(), {
+         const promise = z.request({
+            url: this.getEndPoint(),
             method: 'PUT',
             body: JSON.stringify(this.body),
             headers: {
@@ -30,7 +56,7 @@ class dozukiAPI {
          return promise.then((response) => {
             if (response.status !== httpCodes.success) {
                // Usually a token went bad (401)... we will retry after fetching a new token.
-               throw new Error('API call failed! ' + response.message + " : "
+               throw new Error('API (PUT) call failed! ' + response.message + " : "
                 + response.status + " : " + JSON.stringify(response.json));
             } else {
                if (this.callback) {
@@ -43,9 +69,17 @@ class dozukiAPI {
 //    }
    }
 
+   /**
+    * postDataOnEndpoint
+    *
+    * @param z
+    * @param bundle
+    * @returns {Promise|Promise.<TResult>}
+    */
    postDataOnEndpoint(z, bundle) {
 //   if (this.validPostOptions()) {
-         const promise = z.request(this.getEndPoint(), {
+         const promise = z.request({
+            url: this.getEndPoint(),
             method: 'POST',
             body: JSON.stringify(this.body),
             headers: {
@@ -56,8 +90,8 @@ class dozukiAPI {
          return promise.then((response) => {
             if (response.status !== httpCodes.created && response.status !== httpCodes.success) {
                // Usually a token went bad (401)... we will retry after fetching a new token.
-               throw new Error('API call failed! ' + response.message + " : "
-                + response.status + " : " + JSON.stringify(response.json));
+               throw new Error('API (POST) call failed! ' + response.message + " : "
+                + response.status + " : " + JSON.stringify(response.json));// + " : " + JSON.stringify(response));
             } else {
                if (this.callback) {
                   return this.callback(response, bundle);
@@ -78,12 +112,15 @@ class dozukiAPI {
     */
    getListFromEndpoint(z) {
       if (this.validGetOptions()) {
-         const promise = z.request(this.getEndPoint(), {params: this.getGetParams()});
+         const promise = z.request({
+            url: this.getEndPoint(),
+            params: this.getGetParams(),
+         });
 
          return promise.then((response) => {
             if (response.status !== httpCodes.success) {
                // Usually a token went bad (401)... we will retry after fetching a new token.
-               throw new Error('API call failed! ' + response.message + " : "
+               throw new Error('API (GET) call failed! ' + response.message + " : "
                 + response.status + " : " + JSON.stringify(response.json));
             } else {
                if (this.callback) {
@@ -111,8 +148,13 @@ class dozukiAPI {
        && (this.timeout && this.timeout >= MIN_TIMEOUT && this.timeout <= MAX_TIMEOUT);
    }
 
+   /**
+    * getEndPoint
+    *
+    * @returns {string}
+    */
    getEndPoint() {
-      return 'https://' + this.siteName + '.dozuki.com/api/2.0'
+      return 'https://' + this.siteName + '/api/2.0'
        + this.appendEndpoint();
    }
 
@@ -132,6 +174,7 @@ class dozukiAPI {
    }
 
    /**
+    * getGetParams
     *
     * @returns {Object}
     */
