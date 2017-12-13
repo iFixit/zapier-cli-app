@@ -1,4 +1,44 @@
-const httpCodes  = require('../tools/httpCodes');
+const dozukiAPI = require('../tools/dozukiAPI');
+
+const createPage = (z, bundle) => {
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
+
+   dAPI.timeout  = 3000; // Creates seem to take a little longer?
+   dAPI.endpoint = ['wikis'];
+
+   /* Required */
+   dAPI.body.namespace = bundle.inputData.namespace;
+   dAPI.body.title     = bundle.inputData.title;
+   dAPI.body.contents  = bundle.inputData.contents;
+
+   /* Optional */
+   if (bundle.inputData.displayTitle) {
+      dAPI.body.display_title = bundle.inputData.displayTitle;
+   }
+   if (bundle.inputData.description) {
+      dAPI.body.description = bundle.inputData.description;
+   }
+   if (bundle.inputData.image) {
+      dAPI.body.image = bundle.inputData.image;
+   }
+   if (bundle.inputData.tableOfContents) {
+      dAPI.body.table_of_contents = bundle.inputData.tableOfContents;
+   }
+   if (bundle.inputData.repairabilityScore) {
+      dAPI.body.repairability_score = bundle.inputData.repairabilityScore;
+   }
+   if (bundle.inputData.sourceRevisionId) {
+      dAPI.body.source_revision_id = bundle.inputData.sourceRevisionId;
+   }
+   if (bundle.inputData.flags) {
+      dAPI.body.flags = bundle.inputData.flags;
+   }
+   if (bundle.inputData.suppliers) {
+      dAPI.body.suppliers = bundle.inputData.suppliers;
+   }
+
+   return dAPI.postDataOnEndpoint(z, bundle);
+};
 
 module.exports = {
    key: 'createPage',
@@ -32,60 +72,7 @@ module.exports = {
          {key: 'suppliers', required: false, type: 'string', label: 'Suppliers',
             helpText: 'Array of objects that define types of items and where they can be found. This can be used to populate the item database that can be referenced from guides. All of the fields are optional but there must be at least one. Available on the ITEM namespace. • part_# — Part number. • type — Type of item e.g. color. Can be referenced directly from a guide item. • supplier — Name of supplier/manufacturer. • url — URL of source.'},
       ],
-      perform: (z, bundle) => {
-
-         /* Required */
-         let myBody = {
-            namespace: bundle.inputData.namespace,
-            title: bundle.inputData.title,
-            contents: bundle.inputData.contents
-         };
-
-         /* Optional */
-         if (bundle.inputData.displayTitle) {
-            myBody.display_title = bundle.inputData.displayTitle;
-         }
-         if (bundle.inputData.description) {
-            myBody.description = bundle.inputData.description;
-         }
-         if (bundle.inputData.image) {
-            myBody.image = bundle.inputData.image;
-         }
-         if (bundle.inputData.tableOfContents) {
-            myBody.table_of_contents = bundle.inputData.tableOfContents;
-         }
-         if (bundle.inputData.repairabilityScore) {
-            myBody.repairability_score = bundle.inputData.repairabilityScore;
-         }
-         if (bundle.inputData.sourceRevisionId) {
-            myBody.source_revision_id = bundle.inputData.sourceRevisionId;
-         }
-         if (bundle.inputData.flags) {
-            myBody.flags = bundle.inputData.flags;
-         }
-         if (bundle.inputData.suppliers) {
-            myBody.suppliers = bundle.inputData.suppliers;
-         }
-
-         const promise = z.request({
-            url: 'https://' + bundle.authData.siteName + '.dozuki.com/api/2.0/wikis',
-            method: 'POST',
-            body: JSON.stringify(myBody),
-            headers: {
-               'content-type': 'application/json'
-            }
-         });
-
-         return promise.then((response) => {
-            if (response.status !== httpCodes.created) {
-               // Usually a token went bad (401)... we will retry after fetching a new token.
-               throw new Error('API call failed! ' + response.message + " : "
-                + response.status + " : " + JSON.stringify(response.json));
-            } else {
-               return response.json
-            }
-         });
-      },
+      perform: createPage,
       sample: { wikiid: 752,
          langid: 'en',
          namespace: 'WIKI',
