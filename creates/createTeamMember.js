@@ -10,15 +10,14 @@ const extractDataFromResponse = (response, bundle) => {
          return data[x];
       }
    }
-
    // TODO: This is an error condition that should never be reached?
-   return [];
+   return {};
 };
 
 const createTeamMember = (z, bundle) => {
    let dAPI = new dozukiAPI(bundle.authData.siteName);
 
-   dAPI.timeout  = 3000;
+   dAPI.timeout  = 3000; // Creates seem to take a little longer?
    dAPI.endpoint = ['teams', bundle.inputData.teamId, 'users', bundle.inputData.userId];
    dAPI.callback = extractDataFromResponse;
 
