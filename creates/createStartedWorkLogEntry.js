@@ -1,3 +1,23 @@
+const dozukiAPI = require('../tools/dozukiAPI');
+
+const createStartedWorkLogEntry = (z, bundle) => {
+   let dAPI = new dozukiAPI(bundle.authData.siteName);
+
+   dAPI.timeout  = 3000; // Creates seem to take a little longer?
+   dAPI.endpoint = ['work_log'];
+
+   /* required */
+   dAPI.body.guideid     = bundle.inputData.guideId;
+   dAPI.body.workorderid = bundle.inputData.workorderId;
+
+   /* optional */
+   if (bundle.inputData.joinCode) {
+      dAPI.body.join_code = bundle.inputData.joinCode;
+   }
+
+   return dAPI.postDataOnEndpoint(z, bundle);
+};
+
 module.exports = {
    key: 'createStartedWorkLogEntry',
    noun: 'comment',
@@ -12,23 +32,7 @@ module.exports = {
          {key: 'workorderId', required: true, type: 'string',
             helpText: 'Work order number to tie multiple entries together.'},
       ],
-      perform: (z, bundle) => {
-         let myBody = {
-            guideid: bundle.inputData.guideId,
-            workorderid: bundle.inputData.workorderId
-         };
-
-         const promise = z.request({
-            url: 'https://' + bundle.authData.siteName + '.dozuki.com/api/2.0/work_log',
-            method: 'POST',
-            body: JSON.stringify(myBody),
-            headers: {
-               'content-type': 'application/json'
-            }
-         });
-
-         return promise.then((response) => JSON.parse(response.content));
-      },
+      perform: createStartedWorkLogEntry,
       sample: { entryid: 310,
          guideid: 429,
          userid: 228,
