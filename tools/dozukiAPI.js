@@ -17,6 +17,58 @@ const DEFAULT_ORDER         = 'DESC';
  */
 class dozukiAPI {
 
+   putDataOnEndpoint(z, bundle) {
+//    if (this.validPutOptions()) {
+         const promise = z.request(this.getEndPoint(), {
+            method: 'PUT',
+            body: JSON.stringify(this.body),
+            headers: {
+               'content-type': 'application/json'
+            }
+         });
+
+         return promise.then((response) => {
+            if (response.status !== httpCodes.success) {
+               // Usually a token went bad (401)... we will retry after fetching a new token.
+               throw new Error('API call failed! ' + response.message + " : "
+                + response.status + " : " + JSON.stringify(response.json));
+            } else {
+               if (this.callback) {
+                  return this.callback(response, bundle);
+               } else {
+                  return response.json;
+               }
+            }
+         });
+//    }
+   }
+
+   postDataOnEndpoint(z, bundle) {
+//   if (this.validPostOptions()) {
+         const promise = z.request(this.getEndPoint(), {
+            method: 'POST',
+            body: JSON.stringify(this.body),
+            headers: {
+               'content-type': 'application/json'
+            }
+         });
+
+         return promise.then((response) => {
+            if (response.status !== httpCodes.created && response.status !== httpCodes.success) {
+               // Usually a token went bad (401)... we will retry after fetching a new token.
+               throw new Error('API call failed! ' + response.message + " : "
+                + response.status + " : " + JSON.stringify(response.json));
+            } else {
+               if (this.callback) {
+                  return this.callback(response, bundle);
+               } else {
+                  return response.json;
+               }
+            }
+         });
+//    }
+   }
+
    /**
     * getListFromEndpoint
     *
@@ -25,11 +77,8 @@ class dozukiAPI {
     * @returns {Promise|Promise.<TResult>}
     */
    getListFromEndpoint(z) {
-      if (this.validOptions()) {
-         let url = 'https://' + this.siteName + '.dozuki.com/api/2.0'
-          + this.appendEndpoint();
-
-         const promise = z.request(url, {params: this.getGetParams()});
+      if (this.validGetOptions()) {
+         const promise = z.request(this.getEndPoint(), {params: this.getGetParams()});
 
          return promise.then((response) => {
             if (response.status !== httpCodes.success) {
@@ -54,12 +103,17 @@ class dozukiAPI {
     *
     * @returns {boolean}
     */
-   validOptions() {
+   validGetOptions() {
       return this.siteName && this.siteName.length
        && (this.endpoint && this.endpoint.length)
        && (this.limit && this.limit >= MIN_RESULTS_LIMIT && this.limit <= MAX_RESULTS_LIMIT)
        && (this.order && (this.order === 'ASC' || this.order === 'DESC'))
        && (this.timeout && this.timeout >= MIN_TIMEOUT && this.timeout <= MAX_TIMEOUT);
+   }
+
+   getEndPoint() {
+      return 'https://' + this.siteName + '.dozuki.com/api/2.0'
+       + this.appendEndpoint();
    }
 
    /**
@@ -108,6 +162,7 @@ class dozukiAPI {
       this.timeout       = DEFAULT_TIMEOUT;
       this.getParams     = [];
       this.callback      = null;
+      this.body          = {};
    }
 }
 
