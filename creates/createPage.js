@@ -15,38 +15,57 @@ module.exports = {
             , helpText: 'Title for the wiki. This determines the URL of wiki and the default display_title. If the Page Title is a USER or TEAM, the title must be the userid or teamid as a string.'},
          {key: 'contents', required: true, type: 'string', label: 'Contents',
             helpText: 'Main contents for the wiki. This is a free form wiki text field that gets rendered into HTML. See Wiki Syntax Help docs (`https://www.dozuki.com/Help/Wiki_Syntax`).'},
-/*
-TODO : Add additional fields
-         Display_title
-            Display title for the wiki. This does not change the wiki's title but does change the title used for display. Available to Authors and users with more than 500 reputation on the WIKI, INFO, CATEGORY, and ITEM Page Types.
-         Description
-            ...
-         Image
-            Imageid to set as the main image for this wiki. The image must be available in the user's media manager.
-         Table_of_contents
-            Boolean flag to include a table of contents in the contents_rendered result.
-         Repairability_score
-            Repairability score for the wiki. Valid values are 0 through 10 -- 0 being least repairable and 10 being most repairable. null removes the score. Available to Admins on the CATEGORY namespace on iFixit.
-         Source_revisionid
-            Revisionid for the wiki in the master langid that this wiki is up to date with. This field is required if the wiki being created is a translation of an existing wiki, otherwise it is forbidden.
-         Flags
-            List of flagids to apply to the wiki. See the Flags page for a list of acceptable values as well as our flags documentation for more information.
-         Suppliers
-            Array of objects that define types of items and where they can be found. This can be used to populate the item database that can be referenced from guides. All of the fields are optional but there must be at least one. Available on the ITEM namespace. • part_# — Part number. • type — Type of item e.g. color. Can be referenced directly from a guide item. • supplier — Name of supplier/manufacturer. • url — URL of source.
-*/
+         {key: 'displayTitle', required: false, type: 'string', label: 'Display Title',
+            helpText: "Display title for the wiki. This does not change the wiki's title but does change the title used for display. Available to Authors and users with more than 500 reputation on the WIKI, INFO, CATEGORY, and ITEM Page Types."},
+         {key: 'description', required: false, type: 'string', label: 'Description',
+            helpText: 'A brief description of the page.'},
+         {key: 'image', required: false, type: 'string', label: 'Image',
+            helpText: "Imageid to set as the main image for this wiki. The image must be available in the user's media manager."},
+         {key: 'tableOfContents', required: false, type: 'string', label: 'Table of Contents',
+            helpText: 'Boolean flag to include a table of contents in the contents_rendered result.'},
+         {key: 'repairabilityScore', required: false, type: 'string', label: 'Repairability Score',
+            helpText: 'Repairability score for the wiki. Valid values are 0 through 10 -- 0 being least repairable and 10 being most repairable. null removes the score. Available to Admins on the CATEGORY namespace on iFixit.'},
+         {key: 'sourceRevisionId', required: false, type: 'string', label: 'Source Revision ID',
+            helpText: 'Revisionid for the wiki in the master langid that this wiki is up to date with. This field is required if the wiki being created is a translation of an existing wiki, otherwise it is forbidden.'},
+         {key: 'flags', required: false, type: 'string', label: 'Description',
+            helpText: 'List of flagids to apply to the wiki. See the Flags page for a list of acceptable values as well as our flags documentation for more information.'},
+         {key: 'suppliers', required: false, type: 'string', label: 'Suppliers',
+            helpText: 'Array of objects that define types of items and where they can be found. This can be used to populate the item database that can be referenced from guides. All of the fields are optional but there must be at least one. Available on the ITEM namespace. • part_# — Part number. • type — Type of item e.g. color. Can be referenced directly from a guide item. • supplier — Name of supplier/manufacturer. • url — URL of source.'},
       ],
       perform: (z, bundle) => {
+
+         /* Required */
          let myBody = {
             namespace: bundle.inputData.namespace,
             title: bundle.inputData.title,
             contents: bundle.inputData.contents
          };
 
-
-         // TODO: ADD OPTIONAL PARAMS
-//         if (bundle.inputData.joinCode) {
-//            myBody.join_code = bundle.inputData.joinCode;
-//         }
+         /* Optional */
+         if (bundle.inputData.displayTitle) {
+            myBody.display_title = bundle.inputData.displayTitle;
+         }
+         if (bundle.inputData.description) {
+            myBody.description = bundle.inputData.description;
+         }
+         if (bundle.inputData.image) {
+            myBody.image = bundle.inputData.image;
+         }
+         if (bundle.inputData.tableOfContents) {
+            myBody.table_of_contents = bundle.inputData.tableOfContents;
+         }
+         if (bundle.inputData.repairabilityScore) {
+            myBody.repairability_score = bundle.inputData.repairabilityScore;
+         }
+         if (bundle.inputData.sourceRevisionId) {
+            myBody.source_revision_id = bundle.inputData.sourceRevisionId;
+         }
+         if (bundle.inputData.flags) {
+            myBody.flags = bundle.inputData.flags;
+         }
+         if (bundle.inputData.suppliers) {
+            myBody.suppliers = bundle.inputData.suppliers;
+         }
 
          const promise = z.request({
             url: 'https://' + bundle.authData.siteName + '.dozuki.com/api/2.0/wikis',
