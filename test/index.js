@@ -3,66 +3,69 @@ const zapier = require('zapier-platform-core');
 const App    = require('../index.js');
 const authentication = require('../tools/authentication');
 
+function makeid(idLength) {
+   let text = "";
+   let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+   for (let i = 0; i < idLength; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+   }
+
+   return text;
+}
+
+console.log(makeid());
+
 const appTester = zapier.createAppTester(App);
 
+const exampleTestString = "Ex: $ USER_EMAIL=<useremail> USER_PASSWORD=<user password>  USER_SITE=<user site> zapier test";
+
 describe('My App Tests...', () => {
-   // doAuthTests can potentially change the token out from under a live zap if it is pointing at the same site and using the same user login.
-// TODO: Take my email/password (admin!) out of this code and replace with two tests that use both admin & user 'test' accounts!
-   // doAuthTests('shaun@dozuki.com', 'j1mgyWhy');
-   // doNewTeamTests can potentially change the token out from under a live zap if it is pointing at the same site and using the same user login.
-   //doGetAuthKeyAndNewTeamTests();
+   if (!(process.env.USER_EMAIL && process.env.USER_PASSWORD && process.env.USER_SITE)) {
+      console.log("You must provide a user email and password!\n" + exampleTestString);
+   } else {
+      // doAuthTests can potentially change the token out from under a live zap if it is pointing at the same site and user.
+      // Use a dedicated testing user if possible.
+      doAuthTests(process.env.USER_EMAIL, process.env.USER_PASSWORD);
 
-   let sessionKey = '5eebbd3a231a2c03a2eef68c7035fbb7';
-
-   doNewTeamTests(sessionKey);
-   doNewTeamMemberTests(sessionKey, 35, 55);
-   doNewUserTests(sessionKey);
-   doNewWorkLogEntryTests(sessionKey);
-   doNewPageTests(sessionKey);
-   doNewGuideTests(sessionKey);
-   doNewGuideReleaseTests(sessionKey);
-   doNewImageTests(sessionKey);
-   doNewVideoTests(sessionKey);
-   doCreateCommentTests(sessionKey);
-   doCreateStartedWorkLogEntryTests(sessionKey);
-   doCreateDataCaptureInWorkLogEntryTests(sessionKey);
-   doCreateFinishedWorkLogEntryTests(sessionKey);
-   doCreateUserTests(sessionKey);
-   doCreateTeamMemberTests(sessionKey);
-   doCreatePageTests(sessionKey);
-
+      doNewTeamTests();
+      doNewTeamMemberTests(35, 55);
+      doNewUserTests();
+      doNewWorkLogEntryTests();
+      doNewPageTests();
+      doNewGuideTests();
+      doNewGuideReleaseTests();
+      doNewImageTests();
+      doNewVideoTests();
+      doCreateCommentTests();
+      doCreateStartedWorkLogEntryTests();
+      doCreateDataCaptureInWorkLogEntryTests();
+      doCreateFinishedWorkLogEntryTests();
+      doCreateUserTests();
+      doCreateTeamMemberTests();
+      doCreatePageTests();
+   }
 });
 
+function getAuthData() {
+   return {
+      email: process.env.USER_EMAIL,
+      password: process.env.USER_PASSWORD,
+      siteName: process.env.USER_SITE,
+      sessionKey: process.env.sessionKey
+   };
+}
+
 function doAuthTests(email, password) {
-   const bundle = {
-      authData: {
-         email: email,
-         password: password,
-         siteName: 'slo'
-      }
-   };
-
-   it('Should get auth key for my account', (done) => {
-      appTester(authentication.sessionConfig.perform, bundle)
-       .then(results => {
-          // check the token
-          should(results.sessionKey).be.a.String();
-          console.log(results.sessionKey);
-          done();
-       })
-       .catch(err => {
-          done(err);
-       });
-   });
-
-   const bundleFail = {
-      authData: {
-         email: email,
-         siteName: 'slo'
-      }
-   };
-
+   /* First confirm we don't get a token without a password */
    it('Should NOT get auth key for my account', (done) => {
+      const bundleFail = {
+         authData: {
+            email: email,
+            siteName: 'slo'
+         }
+      };
+
       appTester(authentication.sessionConfig.perform, bundleFail)
        .then(results => {
           // Let someone on the API team know?
@@ -73,88 +76,38 @@ function doAuthTests(email, password) {
           done();
        });
    });
-}
 
-function doGetAuthKeyAndNewTeamTests() {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo'
-      }
-   };
-
+   /* Confirm we get a token... we will use this token for the remaining tests */
    it('Should get auth key for my account', (done) => {
+      const bundle = {
+         authData: {
+            email: email,
+            password: password,
+            siteName: 'slo'
+         }
+      };
       appTester(authentication.sessionConfig.perform, bundle)
        .then(results => {
           // check the token
           should(results.sessionKey).be.a.String();
-
-          bundle.authData.sessionKey = results.sessionKey;
-
+          /* Important: this value is used for the remaining tests */
+          process.env.sessionKey = results.sessionKey;
           done();
        })
        .catch(err => {
           done(err);
        });
    });
-
-   bundle.inputData = {};
-   bundle.inputData.maxMemberSince = 0;
-
-   describe('should retrieve teams waiting', function(){
-      // Polls `someCondition` every 1s
-      const check = function(done) {
-         if (bundle.authData.sessionKey) done();
-         else setTimeout( function(){ check(done) }, 1000 );
-      };
-
-      before(function( done ){
-         check( done );
-      });
-
-      it('should retrieve teams', (done2) => {
-         appTester(App.triggers.newTeam.operation.perform, bundle)
-          .then(results => {
-             console.log('new Team test 1 results', results);
-             bundle.inputData.maxMemberSince = results['maxMemberSince'] + 1;
-             /*
-                       should(results.length).above(1);
-
-                       results.forEach((result) => {
-                          console.log('test result: ', result);
-                       });
-                       const firstResult = results[0];
-
-                       console.log('test result: ', firstResult);
-                       should(firstResult.name).eql('name 1');
-                       should(firstResult.directions).eql('directions 1');
-             */
-
-             done2();
-          })
-          .catch(err => {
-             console.log('catch bogus', err);
-          });
-      });
-   });
 }
 
-function doNewTeamTests(sessionKey) {
-
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      }
-   };
-
+function doNewTeamTests() {
    it('should retrieve teams', (done) => {
+      let bundle = {
+         authData: getAuthData()
+      };
       appTester(App.triggers.newTeam.operation.perform, bundle)
        .then(results => {
-//          console.log('doNewTeamTests', results);
+          // console.log('doNewTeamTests', results);
           done();
        })
        .catch(err => {
@@ -163,20 +116,14 @@ function doNewTeamTests(sessionKey) {
    });
 }
 
-function doNewTeamMemberTests(sessionKey, teamId, badTeamId) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         teamid: teamId
-      }
-   };
-
+function doNewTeamMemberTests(teamId, badTeamId) {
    it('should retrieve team members', (done) => {
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            teamid: teamId
+         }
+      };
       appTester(App.triggers.newTeamMember.operation.perform, bundle)
        .then(results => {
           //console.log('doNewTeamMemberTests', results);
@@ -187,20 +134,14 @@ function doNewTeamMemberTests(sessionKey, teamId, badTeamId) {
        });
    });
 
-   // Test NOT found
-   let bundle2 = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         teamid: badTeamId
-      }
-   };
-
    it('should NOT retrieve new team members', (done) => {
+      // Test NOT found
+      let bundle2 = {
+         authData: getAuthData(),
+         inputData: {
+            teamid: badTeamId
+         }
+      };
       appTester(App.triggers.newTeamMember.operation.perform, bundle2)
        .then(results => {
           done(new Error("We got a token without a password? (Test is broken, or we need to let someone on the API team know about this!)"));
@@ -211,18 +152,11 @@ function doNewTeamMemberTests(sessionKey, teamId, badTeamId) {
    });
 }
 
-function doNewUserTests(sessionKey) {
-
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      }
-   };
-
+function doNewUserTests() {
    it('should retrieve users', (done) => {
+      let bundle = {
+         authData: getAuthData()
+      };
       appTester(App.triggers.newUser.operation.perform, bundle)
        .then(results => {
           // console.log('doNewUserTests', results);
@@ -234,20 +168,15 @@ function doNewUserTests(sessionKey) {
    });
 }
 
-function doNewWorkLogEntryTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         guideid: 416,
-         userid: 5
-      }
-   };
+function doNewWorkLogEntryTests() {
    it('should retrieve new work logs', (done) => {
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            guideid: 416,
+            userid: 5
+         }
+      };
       appTester(App.triggers.newWorkLogEntry.operation.perform, bundle)
        .then(results => {
           // console.log('doNewWorkLogEntryTests', results);
@@ -260,19 +189,14 @@ function doNewWorkLogEntryTests(sessionKey) {
 
 }
 
-function doNewPageTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         pageType: 'WIKI'
-      }
-   };
+function doNewPageTests() {
    it('should retrieve new WIKI pages', (done) => {
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            pageType: 'WIKI'
+         }
+      };
       appTester(App.triggers.newPage.operation.perform, bundle)
        .then(results => {
           //console.log('doNewPageTests', results);
@@ -284,17 +208,11 @@ function doNewPageTests(sessionKey) {
    });
 }
 
-function doNewGuideTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      }
-   };
-
+function doNewGuideTests() {
    it('should retrieve teams', (done) => {
+      let bundle = {
+         authData: getAuthData()
+      };
       appTester(App.triggers.newGuide.operation.perform, bundle)
        .then(results => {
           //console.log('doNewGuideTestsResults=', results);
@@ -306,17 +224,11 @@ function doNewGuideTests(sessionKey) {
    });
 }
 
-function doNewGuideReleaseTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      }
-   };
-
+function doNewGuideReleaseTests() {
    it('should retrieve released guides', (done) => {
+      let bundle = {
+         authData: getAuthData()
+      };
       appTester(App.triggers.newGuideReleased.operation.perform, bundle)
        .then(results => {
           //console.log('doNewGuideTestsResults=', results);
@@ -328,17 +240,11 @@ function doNewGuideReleaseTests(sessionKey) {
    });
 }
 
-function doNewImageTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      }
-   };
-
+function doNewImageTests() {
    it('should retrieve images', (done) => {
+      let bundle = {
+         authData: getAuthData()
+      };
       appTester(App.triggers.newImage.operation.perform, bundle)
        .then(results => {
           // Visual check of final bloats output...
@@ -351,20 +257,14 @@ function doNewImageTests(sessionKey) {
    });
 }
 
-function doNewVideoTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      }
-   };
-
+function doNewVideoTests() {
    it('should retrieve videos', (done) => {
+      let bundle = {
+         authData: getAuthData()
+      };
       appTester(App.triggers.newVideo.operation.perform, bundle)
        .then(results => {
-          console.log('*******\n doNewVideoTests=', results);
+          // console.log('doNewVideoTests=', results);
           done();
        })
        .catch(err => {
@@ -373,27 +273,21 @@ function doNewVideoTests(sessionKey) {
    });
 }
 
-function doCreateCommentTests(sessionKey) {
-   let randomData = Math.random().toString(36).substring(7);
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         parentId: 85,
-         context: 'guide',
-         contextId: 429,
-         commentText: "This is a comment" + randomData
-      }
-   };
-
+function doCreateCommentTests() {
    it('should add a comment', (done) => {
+      let randomData = Math.random().toString(36).substring(7);
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            parentId: 85,
+            context: 'guide',
+            contextId: 429,
+            commentText: "This is a comment" + randomData
+         }
+      };
       appTester(App.creates.createComment.operation.perform, bundle)
        .then(results => {
-          console.log('doCreateCommentTests=', results);
+          // console.log('doCreateCommentTests=', results);
           done();
        })
        .catch(err => {
@@ -402,21 +296,15 @@ function doCreateCommentTests(sessionKey) {
    });
 }
 
-function doCreateStartedWorkLogEntryTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         guideId: 429,
-         workorderId: '1234'
-      }
-   };
-
+function doCreateStartedWorkLogEntryTests() {
    it('should start a work log entry', (done) => {
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            guideId: 429,
+            workorderId: '1234'
+         }
+      };
       appTester(App.creates.createStartedWorkLogEntry.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateStartedWorkLogEntryTests=', results);
@@ -428,20 +316,14 @@ function doCreateStartedWorkLogEntryTests(sessionKey) {
    });
 }
 
-function doCreateFinishedWorkLogEntryTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         entryId: 316
-      }
-   };
-
+function doCreateFinishedWorkLogEntryTests() {
    it('should finish a work log entry', (done) => {
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            entryId: 316
+         }
+      };
       appTester(App.creates.createFinishedWorkLogEntry.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateFinishedWorkLogEntryTests=', results);
@@ -453,24 +335,18 @@ function doCreateFinishedWorkLogEntryTests(sessionKey) {
    });
 }
 
-function doCreateDataCaptureInWorkLogEntryTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         entryId: 315,
-         fields: {
-            "125": "example1",
-            "126": true
-         }
-      }
-   };
-
+function doCreateDataCaptureInWorkLogEntryTests() {
    it('should add data to a work log entry', (done) => {
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            entryId: 315,
+            fields: {
+               "125": "example1",
+               "126": true
+            }
+         }
+      };
       appTester(App.creates.createDataCaptureInWorkLogEntry.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateDataCaptureInWorkLogEntryTests=', results);
@@ -482,27 +358,23 @@ function doCreateDataCaptureInWorkLogEntryTests(sessionKey) {
    });
 }
 
-function doCreateUserTests(sessionKey) {
-   let randomData = Math.random().toString(36).substring(14);
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         email: randomData + '@testjunk.com',
-         username: 'somename' + randomData,
-         password: 'thepassword',
-         uniqueUsername: randomData
-      }
-   };
-
+function doCreateUserTests() {
    it('should create a user', (done) => {
+      let randomData = makeid(12);
+
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            email: randomData + '@dozuki.com',
+            username: randomData,
+            password: 'thepassword',
+            uniqueUsername: randomData
+         }
+      };
+
       appTester(App.creates.createUser.operation.perform, bundle)
        .then(results => {
-          //console.log('doCreateUserTests=', results);
+          // console.log('doCreateUserTests=', results);
           done();
        })
        .catch(err => {
@@ -511,22 +383,16 @@ function doCreateUserTests(sessionKey) {
    });
 }
 
-function doCreateTeamMemberTests(sessionKey) {
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         teamId: 35,
-         userId: 232,
-/*         joinCode: 55 */
-      }
-   };
-
+function doCreateTeamMemberTests() {
    it('should create a new team member', (done) => {
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            teamId: 35,
+            userId: 232,
+/*         joinCode: 55 */
+         }
+      };
       appTester(App.creates.createTeamMember.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateTeamMemberTests=', results);
@@ -538,26 +404,28 @@ function doCreateTeamMemberTests(sessionKey) {
    });
 }
 
-function doCreatePageTests(sessionKey) {
-   let randomData = Math.random().toString(36).substring(7);
-   let bundle = {
-      authData: {
-         email: 'shaun@dozuki.com',
-         password: 'j1mgyWhy',
-         siteName: 'slo',
-         sessionKey: sessionKey
-      },
-      inputData: {
-         namespace: 'WIKI',
-         title: 'A new page by API '  + randomData,
-         contents: 'This is the page content.'
-      }
-   };
-
+function doCreatePageTests() {
    it('should create a new page', (done) => {
+      let randomData = Math.random().toString(36).substring(7);
+      let bundle = {
+         authData: getAuthData(),
+         inputData: {
+            namespace: 'WIKI',
+            title: 'A new page by API ' + randomData,
+            contents: 'This is the page content.',
+            displayTitle: 'Display Title' + randomData,
+            description: 'This is a page description',
+            image: 55,
+            tableOfContents: true,
+            // repairabilityScore: 3,
+            // sourceRevisionId: 20,
+            // flags
+            // suppliers
+         }
+      };
       appTester(App.creates.createPage.operation.perform, bundle)
        .then(results => {
-          console.log('doCreatePageTests=', results);
+          // console.log('doCreatePageTests=', results);
           done();
        })
        .catch(err => {
