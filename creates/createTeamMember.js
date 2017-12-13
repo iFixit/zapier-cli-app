@@ -3,9 +3,8 @@ const dozukiAPI = require('../tools/dozukiAPI');
 const extractDataFromResponse = (response, bundle) => {
    let data = JSON.parse(response.content);
 
-   // Special Case:
-   // The Api returns the entire list of members instead of just the one that
-   // we added.  We have to find that one in the list and return it.
+   // For some reason the API returns the entire list of members, instead of
+   // just the one that we added.  We find the one that we added and return it.
    for (let x in data) {
       if (data.hasOwnProperty(x)
        && (data[x].userid === bundle.inputData.userId)) {
@@ -13,7 +12,7 @@ const extractDataFromResponse = (response, bundle) => {
       }
    }
 
-   // Note: We should only get here if the API returned success without adding.
+   // Note: We can only get here if the API returned success without adding.
    return {};
 };
 
