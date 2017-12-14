@@ -1,7 +1,7 @@
 {
   "name": "dozuki-zapier-app",
-  "version": "1.0.4",
-  "description": "Dozuki app for the Zapier platform.",
+  "version": "1.0.0",
+  "description": "Dozuki App for the Zapier platform.",
   "repository": "dozuki/dozuki-zapier-app",
   "homepage": "https://dozuki.com/",
   "author": "Shaun Harrington <shaun@dozuki.com>",
