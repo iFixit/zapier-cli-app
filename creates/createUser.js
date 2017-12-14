@@ -20,7 +20,7 @@ module.exports = {
    noun: 'create user',
    display: {
       label: 'Create User',
-      description: 'Creates a new user.'
+      description: 'Creates a new user on your Dozuki site.'
    },
    operation: {
       inputFields: [

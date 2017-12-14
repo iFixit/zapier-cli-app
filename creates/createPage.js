@@ -45,7 +45,7 @@ module.exports = {
    noun: 'create page',
    display: {
       label: 'Create Page',
-      description: 'Creates a new page.'
+      description: 'Creates a new page on your Dozuki site.'
    },
    operation: {
       inputFields: [

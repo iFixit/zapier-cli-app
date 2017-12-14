@@ -18,8 +18,8 @@ module.exports = {
    key: 'createImage',
    noun: 'create image',
    display: {
-      label: 'Create Image',
-      description: 'Creates a new image.'
+      label: 'Add Image',
+      description: "Upload an image to the currently logged in user's media manager. The body of the request should be an image file of one of the following types: JPEG, JPG, GIF, PNG, BMP, TIFF, TIF. Note: Some of the sizes might be missing from the response because they are still being generated."
    },
    operation: {
       inputFields: [

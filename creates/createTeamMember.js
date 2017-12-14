@@ -34,8 +34,8 @@ module.exports = {
    key: 'createTeamMember',
    noun: 'create team member',
    display: {
-      label: 'Create Team Member',
-      description: 'Creates a new team member.'
+      label: 'Add Team Member',
+      description: 'Adds a user to a specified team.'
    },
    operation: {
       inputFields: [

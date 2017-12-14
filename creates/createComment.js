@@ -23,8 +23,8 @@ module.exports = {
    key: 'createComment',
    noun: 'comment',
    display: {
-      label: 'Create Comment',
-      description: 'Creates a new comment.'
+      label: 'Add Comment',
+      description: 'Adds a new comment to a document.'
    },
    operation: {
       inputFields: [
