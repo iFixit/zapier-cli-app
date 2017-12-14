@@ -1,5 +1,6 @@
 const httpCodes        = require('./tools/httpCodes');
 const authentication   = require('./tools/authentication');
+const dozukiAPI        = require('./tools/dozukiAPI');
 const triggers         = require('./triggers/includeTriggers');
 const creates          = require('./creates/includeCreates');
 
@@ -82,6 +83,40 @@ const App = {
             }
          }
       },
+      testAPI: {
+         key: 'testAPI',
+         noun: 'testAPI',
+         list: {
+            display: {
+               label: 'Test API',
+               description: 'Test API Resource.',
+               hidden: true
+            },
+            operation: {
+               perform: (z, bundle) => {
+                  let dAPI = new dozukiAPI(bundle.authData.siteName);
+
+                  if (bundle.inputData.method === 'GET') {
+                     dAPI.endpoint = ['teams'];
+                     let promise = dAPI.getListFromEndpoint(z);
+                     return promise.then((data) => {
+                        return [{id: 1, data: data[0]}]
+                     });
+                  } else if (bundle.inputData.method === 'PUT') {
+                     let promise = dAPI.putDataOnEndpoint(z);
+                     return promise.then((data) => {
+                        return [{id: 1, data: data[0]}]
+                     });
+                  } else {
+                     let promise = dAPI.postDataOnEndpoint(z);
+                     return promise.then((data) => {
+                        return [{id: 1, data: data[0]}]
+                     });
+                  }
+               }
+            }
+         }
+      }
    },
    triggers: {
       [triggers.newUser.key]: triggers.newUser,
