@@ -56,13 +56,20 @@ function getAuthData() {
    };
 }
 
-function doAuthTests(email, password) {
+/**
+ * doAuthTests() will test getting a token.
+ *
+ * The resulting token is used by the remaining tests... so this test must
+ * always be first.
+ */
+function doAuthTests() {
    /* First confirm we don't get a token without a password */
-   it('Should NOT get auth key for my account', (done) => {
+   it('Should NOT get auth key for the account', (done) => {
       const bundleFail = {
          authData: {
-            email: email,
-            siteName: 'slo'
+            email: process.env.USER_EMAIL,
+            siteName: process.env.USER_SITE
+            /* Password intentionally left out */
          }
       };
 
@@ -78,12 +85,12 @@ function doAuthTests(email, password) {
    });
 
    /* Confirm we get a token... we will use this token for the remaining tests */
-   it('Should get auth key for my account', (done) => {
+   it('Should get auth key for the account', (done) => {
       const bundle = {
          authData: {
-            email: email,
-            password: password,
-            siteName: 'slo'
+            email: process.env.USER_EMAIL,
+            password: process.env.USER_PASSWORD,
+            siteName: process.env.USER_SITE
          }
       };
       appTester(authentication.sessionConfig.perform, bundle)
@@ -92,11 +99,36 @@ function doAuthTests(email, password) {
           should(results.sessionKey).be.a.String();
           /* Important: this value is used for the remaining tests */
           process.env.sessionKey = results.sessionKey;
-          console.log("      SessionKey:", process.env.sessionKey);
           done();
        })
        .catch(err => {
           done(err);
+       });
+   });
+
+   it('Should get 401 for the account and call RefreshAuthError', (done) => {
+      // Is nice to let an interactive tester know the key.
+      // Log it here so the output looks nice.
+      console.log("      SessionKey:", process.env.sessionKey);
+
+      // Now run the test
+      const bundle = {
+         authData: {
+            email: process.env.USER_EMAIL,
+            password: process.env.USER_PASSWORD,
+            siteName: process.env.USER_SITE,
+            sessionKey: 'aninvalidsessionkey'
+         },
+         inputData: {}
+      };
+      appTester(authentication.test, bundle)
+       .then(results => {
+          done(new Error("We did not fail with a bad token!)"));
+       })
+       .catch(err => {
+          should(err.name).be.a.String();
+          should(err.name).be.equal('RefreshAuthError');
+          done();
        });
    });
 }
@@ -210,7 +242,7 @@ function doNewPageTests() {
 }
 
 function doNewGuideTests() {
-   it('should retrieve teams', (done) => {
+   it('should retrieve guides', (done) => {
       let bundle = {
          authData: getAuthData()
       };
