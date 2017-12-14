@@ -48,6 +48,7 @@ class dozukiAPI {
             url: this.getEndPoint(),
             params: this.getPostParams(),
             method: 'PUT',
+            timeout: this.timeout,
             body: JSON.stringify(this.body),
             headers: {
                'content-type': 'application/json'
@@ -83,6 +84,7 @@ class dozukiAPI {
             url: this.getEndPoint(),
             params: this.getPostParams(),
             method: 'POST',
+            timeout: this.timeout,
             body: JSON.stringify(this.body),
             headers: {
                'content-type': 'application/json'
@@ -117,6 +119,7 @@ class dozukiAPI {
          const promise = z.request({
             url: this.getEndPoint(),
             params: this.getGetParams(),
+            timeout: this.timeout
          });
 
          return promise.then((response) => {
@@ -189,7 +192,6 @@ class dozukiAPI {
       /* These are always set to something */
       myParams.limit = this.limit;
       myParams.order = this.order;
-      myParams.timeout = this.timeout;
 
       return myParams;
    }
