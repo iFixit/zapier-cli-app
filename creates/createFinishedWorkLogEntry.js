@@ -13,7 +13,7 @@ module.exports = {
    key: 'createFinishedWorkLogEntry',
    noun: 'comment',
    display: {
-      label: 'Finish A Work Log Entry',
+      label: 'Finish a Work Log Entry',
       description: 'Finishes a Work Log entry and ends timing capture.'
    },
    operation: {

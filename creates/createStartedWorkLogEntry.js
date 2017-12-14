@@ -22,7 +22,7 @@ module.exports = {
    key: 'createStartedWorkLogEntry',
    noun: 'comment',
    display: {
-      label: 'Start A Work Log Entry',
+      label: 'Start a Work Log Entry',
       description: 'Begins a Work Log entry. After Work Log entry is created, data can be added or it can be finished to end time capture.'
    },
    operation: {

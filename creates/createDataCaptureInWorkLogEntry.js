@@ -27,7 +27,7 @@ module.exports = {
    key: 'createDataCaptureInWorkLogEntry',
    noun: 'comment',
    display: {
-      label: 'Capture Data In Work Log',
+      label: 'Capture Data in Work Log',
       description: "Adds data to in progress Work Log entry."
    },
    operation: {
