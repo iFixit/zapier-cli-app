@@ -36,7 +36,7 @@ const getAuthKey = (z, bundle) => {
 
       // Request an auth token from our API.
       const promise = z.request('https://'+ bundle.authData.siteName
-       +'.dozuki.com/api/2.0/user/token', options);
+       + '/api/2.0/user/token', options);
       return promise.then((response) => {
          if (response.status !== httpCodes.created) {
             if (response.status === httpCodes.unauthorized) {
@@ -76,7 +76,7 @@ const getAuthKey = (z, bundle) => {
 module.exports = {
    type: 'session',
    test: {
-      url: 'https://{{bundle.authData.siteName}}.dozuki.com/api/2.0/user'
+      url: 'https://{{bundle.authData.siteName}}/api/2.0/user'
    },
    connectionLabel: '{{bundle.authData.email}}',
    fields: [
