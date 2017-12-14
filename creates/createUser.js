@@ -31,7 +31,7 @@ module.exports = {
          {key: 'password', required: true, type: 'string', label: 'Password',
             helpText: 'Account password.'},
          {key: 'uniqueUsername', required: true, type: 'string', label: 'Unique Username',
-            helpText: 'A unique username name for this user.'},
+            helpText: 'A unique username name for this user.  (Must be all lowercase!)'},
       ],
       perform: createUser,
       sample: { userid: 232,
