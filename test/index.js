@@ -147,10 +147,15 @@ function doDozukiAPITests() {
             method: 'GET'
          }
       };
+      // Will pull from the '/teams' endpoint
       appTester(App.resources.testAPI.list.operation.perform, bundle)
        .then(results => {
-          console.log(results);
-          // TODO: Test the results
+          // We should get an 'id' that we set to 1 in the 'perform'
+          should(results[0].id).be.a.Number();
+          should(results[0].id).be.equal(1);
+          // We should get a teamid from the endpoint
+          should(results[0].data.teamid).be.a.Number().above (1);
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -204,6 +209,13 @@ function doNewTeamTests() {
       appTester(App.triggers.newTeam.operation.perform, bundle)
        .then(results => {
           // console.log('doNewTeamTests', results);
+          // We should get an 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get a 'teamid'.
+          should(results[0].teamid).be.a.Number().above(0);
+          // The 'teamid' should equal the 'id'.
+          should(results[0].teamid).be.equal(results[0].id);
+          // That should be good enough.
           done();
        })
        .catch(err => {
