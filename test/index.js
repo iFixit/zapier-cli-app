@@ -23,7 +23,7 @@ describe('My App Tests...', () => {
       // doAuthTests can potentially change the token out from under a live zap if it is pointing at the same site and user.
       // Use a dedicated testing user if possible.
       doAuthTests(process.env.USER_EMAIL, process.env.USER_PASSWORD);
-
+      doDozukiAPITests();
       doNewTeamTests();
       doNewTeamMemberTests(35, 55); // TODO: turn these a magic numbers into process.env variables?
       doNewUserTests();
@@ -47,6 +47,11 @@ describe('My App Tests...', () => {
    }
 });
 
+/**
+ * getAuthData
+ *
+ * @returns {{email: *, password: *, siteName: *, sessionKey: (*|string)}}
+ */
 function getAuthData() {
    return {
       email: process.env.USER_EMAIL,
@@ -97,7 +102,7 @@ function doAuthTests() {
        .then(results => {
           // check the token
           should(results.sessionKey).be.a.String();
-          /* Important: this value is used for the remaining tests */
+          // Important: this value is used for the remaining tests
           process.env.sessionKey = results.sessionKey;
           done();
        })
@@ -131,6 +136,64 @@ function doAuthTests() {
           done();
        });
    });
+}
+
+function doDozukiAPITests() {
+   /* Confirm we get a token... we will use this token for the remaining tests */
+   it('Should do a GET', (done) => {
+      const bundle = {
+         authData: getAuthData(),
+         inputData: {
+            method: 'GET'
+         }
+      };
+      appTester(App.resources.testAPI.list.operation.perform, bundle)
+       .then(results => {
+          console.log(results);
+          // TODO: Test the results
+          done();
+       })
+       .catch(err => {
+          done(err);
+       });
+   });
+
+   /*
+   TODO: These are a little harder to test... not sure what to do yet.
+   it('Should do a PUT', (done) => {
+      const bundle = {
+         authData: getAuthData(),
+         inputData: {
+            method: 'PUT'
+         }
+      };
+      appTester(App.resources.testAPI.list.operation.perform, bundle)
+       .then(results => {
+          console.log(results);
+          done();
+       })
+       .catch(err => {
+          done(err);
+       });
+   });
+
+   it('Should do a POST', (done) => {
+      const bundle = {
+         authData: getAuthData(),
+         inputData: {
+            method: 'POST'
+         }
+      };
+      appTester(App.resources.testAPI.list.operation.perform, bundle)
+       .then(results => {
+          console.log(results);
+          done();
+       })
+       .catch(err => {
+          done(err);
+       });
+   });
+   */
 }
 
 function doNewTeamTests() {
