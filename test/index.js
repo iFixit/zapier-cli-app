@@ -443,8 +443,14 @@ function doNewImageTests() {
       };
       appTester(App.triggers.newImage.operation.perform, bundle)
        .then(results => {
-          // Visual check of final bloats output...
-          //console.log('doNewImageTests=', results);
+          // console.log('doNewImageTests=', results);
+          // We should get an 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get a 'image.id'.
+          should(results[0].image.id).be.a.Number().above(0);
+          // The 'id' should equal the 'image.id'.
+          should(results[0].id).be.equal(results[0].image.id);
+          // That should be good enough.
           done();
        })
        .catch(err => {
