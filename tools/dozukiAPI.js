@@ -46,6 +46,7 @@ class dozukiAPI {
 //    if (this.validPutOptions()) {
          const promise = z.request({
             url: this.getEndPoint(),
+            params: this.getPostParams(),
             method: 'PUT',
             body: JSON.stringify(this.body),
             headers: {
@@ -80,6 +81,7 @@ class dozukiAPI {
 //   if (this.validPostOptions()) {
          const promise = z.request({
             url: this.getEndPoint(),
+            params: this.getPostParams(),
             method: 'POST',
             body: JSON.stringify(this.body),
             headers: {
@@ -188,6 +190,20 @@ class dozukiAPI {
       myParams.limit = this.limit;
       myParams.order = this.order;
       myParams.timeout = this.timeout;
+
+      return myParams;
+   }
+
+   /**
+    * getPostParams
+    *
+    * @returns {{}}
+    */
+   getPostParams() {
+      let myParams = {};
+      Object.keys(this.getParams).forEach(key => {
+         myParams[key] = this.getParams[key];
+      });
 
       return myParams;
    }
