@@ -55,7 +55,7 @@ module.exports = {
    noun: 'New Work Log Entry',
    display: {
       label: 'New Work Log Entry',
-      description: 'Triggers when new work logs are added to the site.'
+      description: 'A Work Log Entry represents a single run-through of a guide. This is used with the data-entry feature to record timing information on guide completions.'
    },
    operation: {
       inputFields: [

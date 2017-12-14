@@ -44,7 +44,7 @@ module.exports = {
    noun: 'New User',
    display: {
       label: 'New User',
-      description: 'Triggers when new users are added to the site.'
+      description: 'Triggers when new users are added to your site.'
    },
    operation: {
       sample: {

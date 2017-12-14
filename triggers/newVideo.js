@@ -44,7 +44,7 @@ module.exports = {
    noun: 'new video',
    display: {
       label: 'New Video',
-      description: "Triggers when new videos are added to the user's media manager."
+      description: "Returns videos from a user's media manager."
    },
    operation: {
       sample: {

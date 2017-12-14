@@ -44,7 +44,7 @@ module.exports = {
    noun: 'NewTeam',
    display: {
       label: 'New Team',
-      description: 'Triggers when new teams are added to the site.'
+      description: 'Triggers when new a team is created.'
    },
    operation: {
       sample: {

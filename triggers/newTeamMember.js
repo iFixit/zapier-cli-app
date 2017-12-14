@@ -44,7 +44,7 @@ module.exports = {
    noun: 'New Team Member',
    display: {
       label: 'New Team Member',
-      description: 'Triggers when new team members are added to the site.'
+      description: 'Triggers when new users are added to a specified team.'
    },
    operation: {
       inputFields: [

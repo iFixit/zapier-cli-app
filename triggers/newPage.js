@@ -38,8 +38,8 @@ module.exports = {
    key: 'newPage',
    noun: 'New Page',
    display: {
-      label: 'New Page',
-      description: 'Triggers when new pages are added to the site.'
+      label: 'New Page Created',
+      description: 'Triggers when a new page of a specified type is created.'
    },
    operation: {
       inputFields: [
