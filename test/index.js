@@ -14,14 +14,16 @@ function makeid(idLength) {
 
 const appTester = zapier.createAppTester(App);
 
-const exampleTestString = "Ex: $ USER_EMAIL=<useremail> USER_PASSWORD=<user password>  USER_SITE=<user site> USER_VALIDTEAM=<valid team id> USER_INVALIDTEAM=<invalid team id> zapier test";
+const exampleTestString = "Ex: $ USER_EMAIL=<useremail> USER_PASSWORD=<user password>  USER_SITE=<user site> USER_VALIDTEAM=<valid team id> USER_INVALIDTEAM=<invalid team id> USER_VALIDGUIDE=<valid guide id> USER_VALIDUSER=<valid user id> zapier test";
 
 describe('My App Tests...', () => {
    if (!(process.env.USER_EMAIL
      && process.env.USER_PASSWORD
      && process.env.USER_SITE
      && process.env.USER_VALIDTEAM
-     && process.env.USER_INVALIDTEAM)) {
+     && process.env.USER_INVALIDTEAM
+     && process.env.USER_VALIDGUIDE
+     && process.env.USER_VALIDUSER)) {
       console.log("You must provide a user email and password!\n"
        + exampleTestString);
    } else {
@@ -34,7 +36,7 @@ describe('My App Tests...', () => {
       doNewTeamTests();
       doNewTeamMemberTests(process.env.USER_VALIDTEAM, process.env.USER_INVALIDTEAM);
       doNewUserTests();
-      doNewWorkLogEntryTests(416, 5);
+      doNewWorkLogEntryTests(process.env.USER_VALIDGUIDE, process.env.USER_VALIDUSER);
       doNewPageTests();
       doNewGuideTests();
       doNewGuideReleaseTests();
@@ -48,11 +50,10 @@ describe('My App Tests...', () => {
       doCreateFinishedWorkLogEntryTests();
       doCreateTeamMemberTests();
       doCreatePageTests();
-// TODO: The commented out test are failing!
-// TODO: Is something wrong with these endpoints?
-// TODO: Issues have been opened. (#1 and #2)
-      //doCreateUserTests();
-      //doCreateImageTests();
+      // TODO: Is something wrong with these endpoints?
+      // TODO: Issues have been opened. (#1 and #2)
+      doCreateUserTests();
+      doCreateImageTests();
    }
 });
 
@@ -493,6 +494,9 @@ function doNewVideoTests() {
  * CREATES
  *****************/
 
+/**
+ * doCreateCommentTests
+ */
 function doCreateCommentTests() {
    it('should add a comment', (done) => {
       let randomData = Math.random().toString(36).substring(7);
@@ -508,6 +512,7 @@ function doCreateCommentTests() {
       appTester(App.creates.createComment.operation.perform, bundle)
        .then(results => {
           // console.log('doCreateCommentTests=', results);
+          should(results.commentid).be.a.Number().above(0);
           done();
        })
        .catch(err => {
@@ -516,6 +521,9 @@ function doCreateCommentTests() {
    });
 }
 
+/**
+ * doCreateStartedWorkLogEntryTests
+ */
 function doCreateStartedWorkLogEntryTests() {
    it('should start a work log entry', (done) => {
       let bundle = {
@@ -528,6 +536,7 @@ function doCreateStartedWorkLogEntryTests() {
       appTester(App.creates.createStartedWorkLogEntry.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateStartedWorkLogEntryTests=', results);
+          should(results.entryid).be.a.Number().above(0);
           done();
        })
        .catch(err => {
@@ -536,6 +545,9 @@ function doCreateStartedWorkLogEntryTests() {
    });
 }
 
+/**
+ * doCreateFinishedWorkLogEntryTests
+ */
 function doCreateFinishedWorkLogEntryTests() {
    it('should finish a work log entry', (done) => {
       let bundle = {
@@ -547,6 +559,7 @@ function doCreateFinishedWorkLogEntryTests() {
       appTester(App.creates.createFinishedWorkLogEntry.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateFinishedWorkLogEntryTests=', results);
+          should(results.endtime).be.a.Number().above(0);
           done();
        })
        .catch(err => {
@@ -555,6 +568,9 @@ function doCreateFinishedWorkLogEntryTests() {
    });
 }
 
+/**
+ * doCreateDataCaptureInWorkLogEntryTests
+ */
 function doCreateDataCaptureInWorkLogEntryTests() {
    it('should add data to a work log entry', (done) => {
       let bundle = {
@@ -570,6 +586,9 @@ function doCreateDataCaptureInWorkLogEntryTests() {
       appTester(App.creates.createDataCaptureInWorkLogEntry.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateDataCaptureInWorkLogEntryTests=', results);
+
+          // The API does not return a response, so there are no outputFields.
+
           done();
        })
        .catch(err => {
@@ -578,6 +597,9 @@ function doCreateDataCaptureInWorkLogEntryTests() {
    });
 }
 
+/**
+ * doCreateTeamMemberTests
+ */
 function doCreateTeamMemberTests() {
    it('should create a new team member', (done) => {
       let bundle = {
@@ -591,6 +613,7 @@ function doCreateTeamMemberTests() {
       appTester(App.creates.createTeamMember.operation.perform, bundle)
        .then(results => {
           //console.log('doCreateTeamMemberTests=', results);
+          should(results.userid).be.a.Number().above(0);
           done();
        })
        .catch(err => {
@@ -599,6 +622,9 @@ function doCreateTeamMemberTests() {
    });
 }
 
+/**
+ * doCreatePageTests
+ */
 function doCreatePageTests() {
    it('should create a new page', (done) => {
       let randomData = Math.random().toString(36).substring(7);
@@ -621,6 +647,7 @@ function doCreatePageTests() {
       appTester(App.creates.createPage.operation.perform, bundle)
        .then(results => {
           // console.log('doCreatePageTests=', results);
+          should(results.wikiid).be.a.Number().above(0);
           done();
        })
        .catch(err => {
@@ -629,9 +656,12 @@ function doCreatePageTests() {
    });
 }
 
+/**
+ * doCreateUserTests
+ */
 function doCreateUserTests() {
    it('should create a user', (done) => {
-      let randomData = makeid(10);
+      let randomData = makeid(10).toLowerCase();
 
       let bundle = {
          authData: getAuthData(),
@@ -646,6 +676,7 @@ function doCreateUserTests() {
       appTester(App.creates.createUser.operation.perform, bundle)
        .then(results => {
           // console.log('doCreateUserTests=', results);
+          should(results.userid).be.a.Number().above(0);
           done();
        })
        .catch(err => {
@@ -654,18 +685,22 @@ function doCreateUserTests() {
    });
 }
 
+/**
+ * doCreateImageTests
+ */
 function doCreateImageTests() {
    it('should create a new image', (done) => {
       let bundle = {
          authData: getAuthData(),
          inputData: {
-            file: 'https://wallpaperbrowse.com/media/images/colors_explosion_wallpaper_abstract_3d_45.jpg',
+            file: 'colors_explosion_wallpaper_abstract_3d_45.jpg',
             cropToRatio: 'VARIABLE',
          }
       };
       appTester(App.creates.createImage.operation.perform, bundle)
        .then(results => {
-          console.log('doCreateImageTests=', results);
+          // console.log('doCreateImageTests=', results);
+          should(results.image.id).be.a.Number().above(0);
           done();
        })
        .catch(err => {
