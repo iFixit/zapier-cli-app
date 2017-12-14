@@ -14,25 +14,34 @@ function makeid(idLength) {
 
 const appTester = zapier.createAppTester(App);
 
-const exampleTestString = "Ex: $ USER_EMAIL=<useremail> USER_PASSWORD=<user password>  USER_SITE=<user site> zapier test";
+const exampleTestString = "Ex: $ USER_EMAIL=<useremail> USER_PASSWORD=<user password>  USER_SITE=<user site> USER_VALIDTEAM=<valid team id> USER_INVALIDTEAM=<invalid team id> zapier test";
 
 describe('My App Tests...', () => {
-   if (!(process.env.USER_EMAIL && process.env.USER_PASSWORD && process.env.USER_SITE)) {
-      console.log("You must provide a user email and password!\n" + exampleTestString);
+   if (!(process.env.USER_EMAIL
+     && process.env.USER_PASSWORD
+     && process.env.USER_SITE
+     && process.env.USER_VALIDTEAM
+     && process.env.USER_INVALIDTEAM)) {
+      console.log("You must provide a user email and password!\n"
+       + exampleTestString);
    } else {
       // doAuthTests can potentially change the token out from under a live zap if it is pointing at the same site and user.
       // Use a dedicated testing user if possible.
       doAuthTests(process.env.USER_EMAIL, process.env.USER_PASSWORD);
       doDozukiAPITests();
+
+      // Triggers
       doNewTeamTests();
-      doNewTeamMemberTests(35, 55); // TODO: turn these a magic numbers into process.env variables?
+      doNewTeamMemberTests(process.env.USER_VALIDTEAM, process.env.USER_INVALIDTEAM);
       doNewUserTests();
-      doNewWorkLogEntryTests();
+      doNewWorkLogEntryTests(416, 5);
       doNewPageTests();
       doNewGuideTests();
       doNewGuideReleaseTests();
       doNewImageTests();
       doNewVideoTests();
+
+      // Creates
       doCreateCommentTests();
       doCreateStartedWorkLogEntryTests();
       doCreateDataCaptureInWorkLogEntryTests();
@@ -138,6 +147,9 @@ function doAuthTests() {
    });
 }
 
+/**
+ * doDozukiAPITests
+ */
 function doDozukiAPITests() {
    /* Confirm we get a token... we will use this token for the remaining tests */
    it('Should do a GET', (done) => {
@@ -201,6 +213,13 @@ function doDozukiAPITests() {
    */
 }
 
+/******************
+ * TRIGGERS
+ *****************/
+
+/**
+ * doNewTeamTests
+ */
 function doNewTeamTests() {
    it('should retrieve teams', (done) => {
       let bundle = {
@@ -224,6 +243,12 @@ function doNewTeamTests() {
    });
 }
 
+/**
+ * doNewTeamMemberTests
+ *
+ * @param teamId
+ * @param badTeamId
+ */
 function doNewTeamMemberTests(teamId, badTeamId) {
    it('should retrieve team members', (done) => {
       let bundle = {
@@ -234,7 +259,14 @@ function doNewTeamMemberTests(teamId, badTeamId) {
       };
       appTester(App.triggers.newTeamMember.operation.perform, bundle)
        .then(results => {
-          //console.log('doNewTeamMemberTests', results);
+          // console.log('doNewTeamMemberTests', results);
+          // We should get 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get 'userid'.
+          should(results[0].userid).be.a.Number().above(0);
+          // The 'userid' should equal the 'id'.
+          should(results[0].userid).be.equal(results[0].id);
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -242,15 +274,15 @@ function doNewTeamMemberTests(teamId, badTeamId) {
        });
    });
 
-   it('should NOT retrieve new team members', (done) => {
+   it('should NOT retrieve team members', (done) => {
       // Test NOT found
-      let bundle2 = {
+      let bundle = {
          authData: getAuthData(),
          inputData: {
             teamid: badTeamId
          }
       };
-      appTester(App.triggers.newTeamMember.operation.perform, bundle2)
+      appTester(App.triggers.newTeamMember.operation.perform, bundle)
        .then(results => {
           done(new Error("We got a token without a password? (Test is broken, or we need to let someone on the API team know about this!)"));
        })
@@ -260,6 +292,9 @@ function doNewTeamMemberTests(teamId, badTeamId) {
    });
 }
 
+/**
+ * doNewUserTests
+ */
 function doNewUserTests() {
    it('should retrieve users', (done) => {
       let bundle = {
@@ -268,6 +303,13 @@ function doNewUserTests() {
       appTester(App.triggers.newUser.operation.perform, bundle)
        .then(results => {
           // console.log('doNewUserTests', results);
+          // We should get an 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get a 'userid'.
+          should(results[0].userid).be.a.Number().above(0);
+          // The 'userid' should equal the 'id'.
+          should(results[0].userid).be.equal(results[0].id);
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -276,18 +318,28 @@ function doNewUserTests() {
    });
 }
 
-function doNewWorkLogEntryTests() {
+/**
+ * doNewWorkLogEntryTests
+ */
+function doNewWorkLogEntryTests(guideId, userId) {
    it('should retrieve new work logs', (done) => {
       let bundle = {
          authData: getAuthData(),
          inputData: {
-            guideid: 416,
-            userid: 5
+            guideid: guideId,
+            userid: userId
          }
       };
       appTester(App.triggers.newWorkLogEntry.operation.perform, bundle)
        .then(results => {
           // console.log('doNewWorkLogEntryTests', results);
+          // We should get an 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get a 'entryid'.
+          should(results[0].entryid).be.a.Number().above(0);
+          // The 'entryid' should equal the 'id'.
+          should(results[0].entryid).be.equal(results[0].id);
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -297,6 +349,9 @@ function doNewWorkLogEntryTests() {
 
 }
 
+/**
+ * doNewPageTests
+ */
 function doNewPageTests() {
    it('should retrieve new WIKI pages', (done) => {
       let bundle = {
@@ -308,6 +363,13 @@ function doNewPageTests() {
       appTester(App.triggers.newPage.operation.perform, bundle)
        .then(results => {
           //console.log('doNewPageTests', results);
+          // We should get an 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get a 'wikiid'.
+          should(results[0].wikiid).be.a.Number().above(0);
+          // The 'wikiid' should equal the 'id'.
+          should(results[0].wikiid).be.equal(results[0].id);
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -316,6 +378,9 @@ function doNewPageTests() {
    });
 }
 
+/**
+ * doNewGuideTests
+ */
 function doNewGuideTests() {
    it('should retrieve guides', (done) => {
       let bundle = {
@@ -324,6 +389,13 @@ function doNewGuideTests() {
       appTester(App.triggers.newGuide.operation.perform, bundle)
        .then(results => {
           //console.log('doNewGuideTestsResults=', results);
+          // We should get an 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get a 'guideid'.
+          should(results[0].guideid).be.a.Number().above(0);
+          // The 'guideid' should equal the 'id'.
+          should(results[0].guideid).be.equal(results[0].id);
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -332,6 +404,9 @@ function doNewGuideTests() {
    });
 }
 
+/**
+ * doNewGuideReleaseTests
+ */
 function doNewGuideReleaseTests() {
    it('should retrieve released guides', (done) => {
       let bundle = {
@@ -339,7 +414,17 @@ function doNewGuideReleaseTests() {
       };
       appTester(App.triggers.newGuideReleased.operation.perform, bundle)
        .then(results => {
-          //console.log('doNewGuideTestsResults=', results);
+          // console.log('doNewGuideTestsResults=', results);
+          // We should get a 'releaseid'.
+          should(results[0].releaseid).be.a.Number().above(0);
+          // We should get a 'status'.
+          should(results[0].status).be.a.String();
+          // We should get an 'id'.
+          should(results[0].id).be.a.String();
+          // The 'releaseid' concatenated with 'status' should equal the 'id'.
+          should(results[0].releaseid.toString().concat(results[0].status)).be.equal(results[0].id);
+
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -348,6 +433,9 @@ function doNewGuideReleaseTests() {
    });
 }
 
+/**
+ * doNewImageTests
+ */
 function doNewImageTests() {
    it('should retrieve images', (done) => {
       let bundle = {
@@ -365,6 +453,9 @@ function doNewImageTests() {
    });
 }
 
+/**
+ * doNewVideoTests
+ */
 function doNewVideoTests() {
    it('should retrieve videos', (done) => {
       let bundle = {
@@ -373,6 +464,17 @@ function doNewVideoTests() {
       appTester(App.triggers.newVideo.operation.perform, bundle)
        .then(results => {
           // console.log('doNewVideoTests=', results);
+          // We should get an 'id'.
+          should(results[0].id).be.a.Number().above(0);
+          // We should get a 'videoid'.
+          should(results[0].videoid).be.a.Number().above(0);
+          // The 'videoid' should equal the 'id'.
+          should(results[0].videoid).be.equal(results[0].id);
+          // for each 'encodings' we should have a 'encoding.column' node.
+          for(let x in results[0].encodings) {
+             should(results[0][results[0].encodings[x].column].column).be.equal(results[0].encodings[x].column);
+          }
+          // That should be good enough.
           done();
        })
        .catch(err => {
@@ -380,6 +482,10 @@ function doNewVideoTests() {
        });
    });
 }
+
+/******************
+ * CREATES
+ *****************/
 
 function doCreateCommentTests() {
    it('should add a comment', (done) => {
