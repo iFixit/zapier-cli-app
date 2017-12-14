@@ -81,7 +81,7 @@ module.exports = {
    connectionLabel: '{{bundle.authData.email}}',
    fields: [
       {key: 'siteName', label: 'Site Name', type: 'string',
-         inputFormat: 'https://.{{input}}.dozuki.com',
+         inputFormat: 'https://{{input}}',
          helpText: 'What is the name of your Dozuki site (e.g. yoursitename.dozuki.com).',
          required: true, placeholder: 'Enter Your Site Name'},
       {key: 'email', label: 'Username (email address)', type: 'string',
