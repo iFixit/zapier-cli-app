@@ -25,10 +25,10 @@ const API_APP_ID = '9c9e0e7ae61d3a70bfe4debb87ad145a';
  * @returns {*}
  */
 const addApiKeyToHeader = (request, z, bundle) => {
+   request.headers = request.headers || {};
+   request.headers['X-App-Id'] = API_APP_ID;
    if (bundle.authData.sessionKey) {
-      request.headers = request.headers || {};
       request.headers['Authorization'] = 'api ' + bundle.authData.sessionKey;
-      request.headers['X-App-Id'] = API_APP_ID;
    }
    return request;
 };
