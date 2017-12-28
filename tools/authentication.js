@@ -31,7 +31,7 @@ const getAuthKey = (z, bundle) => {
          body: JSON.stringify({
             email: bundle.authData.email,
             password: bundle.authData.password
-         }),
+         })
       };
 
       // Request an auth token from our API.
