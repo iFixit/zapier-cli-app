@@ -31,6 +31,15 @@ const checkForNewPages = (z, bundle) => {
    dAPI.endpoint = ['wikis', bundle.inputData.pageType];
    dAPI.callback = extractDataFromResponse;
 
+   function toTimestamp(strDate){
+      var datum = Date.parse(strDate);
+      return datum/1000;
+   }
+
+   if (bundle.inputData.modifiedSince) {
+      dAPI.getParams.modifiedSince = toTimestamp(bundle.inputData.modifiedSince);
+   }
+
    return dAPI.getListFromEndpoint(z);
 };
 
@@ -49,6 +58,13 @@ module.exports = {
             label: 'Choose Page Type',
             choices: {WIKI: 'Wiki', CATEGORY: 'Category', INFO: 'Info', ITEM: 'Item'}
          },
+         {
+            key: 'modifiedSince',
+            required: false,
+            label: 'Select a date after which results to return have been modified.',
+            helpText: "Type a date, date time or use '{{zap_meta_human_now}}' for now.  See [datetimes](https://zapier.com/help/field-types/#datetimes) and [modifying dates and times](https://zapier.com/help/modifying-dates-and-times/) for more details.",
+            type: 'datetime'
+         }
       ],
       sample: {
          "id": 98,
